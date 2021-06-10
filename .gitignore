@@ -2,8 +2,19 @@
 .Rhistory
 .RData
 .Ruserdata
-<<<<<<< HEAD
-=======
+
 .DS_Store
->>>>>>> main
+
+
+.ipynb_checkpoints
+
+*.csv
+*.xlsx
+*.xls
+*.RDS
+
+ 
+
+/data
+*cache*
 
