@@ -3,4 +3,15 @@
 .RData
 .Ruserdata
 .DS_Store
+.ipynb_checkpoints
+
+*.csv
+*.xlsx
+*.xls
+*.RDS
+
+ 
+
+/data
+*cache*
 
