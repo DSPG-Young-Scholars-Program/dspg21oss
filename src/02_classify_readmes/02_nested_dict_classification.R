@@ -41,7 +41,7 @@ communications <- paste(c("\\b(?i)(zcx", communications$term, "zcx)\\b"), collap
 
 # based on sub_type 
 database_servers <- software_types %>% filter(sub_type == "Database Engines/Servers")
-#database_servers <- paste(c("\\b(?i)(zcx", database_servers$term, "zcx)\\b"), collapse = "|")
+# database_servers <- paste(c("\\b(?i)(zcx", database_servers$term, "zcx)\\b"), collapse = "|")
 
 
 # development space (so you don't have to do refresh the csv with each update) ###########################################
