@@ -1,0 +1,13 @@
+
+
+readme_raw <- read_csv("oss_readme_data_0615.csv") %>% 
+    filter(status == "Done") %>% 
+    distinct(slug)
+
+readme_raw <- read_csv("oss_software_types.csv") %>% filter(category == "blockchain")
+
+
+
+
+# references 
+# https://github.com/brandonleekramer/diversity/blob/master/src/02_text_trends/04_hypothesis4.R 
