@@ -48,7 +48,7 @@ database_servers <- software_types %>% filter(sub_type == "Database Engines/Serv
 
 # it gets annoying to go back to that csv each time so you can just add words to the string and then rerun your function 
 database_servers <- paste(c("\\b(?i)(zcx", database_servers$term, 
-                            "database mangement|databases",
+                            "database mangement|databases|postgresql|postgres",
                             "zcx)\\b"), collapse = "|")
 
 # and then if you want to output your updated string and paste it back to the csv you can do it with this 
@@ -70,10 +70,10 @@ readme_classified <- readme_processed %>%
   # first turn this into a data.table object for speed 
   as.data.table() %>% 
   # then you can EITHER classify all categories into one columns separated by commas 
-  dt_mutate(cats_as_text = ifelse(test = str_detect(string = readme_text, pattern = blockchain), 
-                                  yes = "blockchain", no = "")) %>%
-  dt_mutate(cats_as_text = ifelse(test = str_detect(string = readme_text, pattern = communications), 
-                                  paste("communications", cats_as_text, sep=", "), no = cats_as_text)) %>%
+  #dt_mutate(cats_as_text = ifelse(test = str_detect(string = readme_text, pattern = blockchain), 
+  #                                yes = "blockchain", no = "")) %>%
+  #dt_mutate(cats_as_text = ifelse(test = str_detect(string = readme_text, pattern = communications), 
+  #                                paste("communications", cats_as_text, sep=", "), no = cats_as_text)) %>%
   # OR classify the categories as binary variables in a matrix 
   dt_mutate(blockchain = ifelse(test = str_detect(string = readme_text, pattern = blockchain), 1, 0)) %>%
   dt_mutate(communications = ifelse(test = str_detect(string = readme_text, pattern = communications), 1, 0))
