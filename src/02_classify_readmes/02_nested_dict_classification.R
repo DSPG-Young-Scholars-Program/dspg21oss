@@ -62,6 +62,7 @@ write_csv(vector_to_unnest, str_c(path_for_data, "terms_to_update.csv"))
 
 readme_processed <- readme_raw_data %>% 
   mutate(readme_text = tolower(readme_text))
+# NOTE: THIS STEP NEEDS WAY MORE WORK 
 
 # classification #########################################################################################################
 
@@ -73,7 +74,7 @@ readme_classified <- readme_processed %>%
                                   yes = "blockchain", no = "")) %>%
   dt_mutate(cats_as_text = ifelse(test = str_detect(string = readme_text, pattern = communications), 
                                   paste("communications", cats_as_text, sep=", "), no = cats_as_text)) %>%
-  # OR classify the categories as a matrix 
+  # OR classify the categories as binary variables in a matrix 
   dt_mutate(blockchain = ifelse(test = str_detect(string = readme_text, pattern = blockchain), 1, 0)) %>%
   dt_mutate(communications = ifelse(test = str_detect(string = readme_text, pattern = communications), 1, 0))
 
