@@ -14,12 +14,12 @@ readme_raw_data <- read_csv("oss_readme_data_061521.csv") %>%
   distinct(slug, readme_text, batch, as_of, status)
            
 # or grab data from postgresql 
-conn <- dbConnect(drv = PostgreSQL(), dbname = "sdad", 
-                  host = "10.250.124.195", port = 5432, 
-                  user = Sys.getenv("db_userid"), 
-                  password = Sys.getenv("db_pwd"))
-readme_raw_data <- dbGetQuery(conn, "select * from gh_2007_2020.readme_data;")
-dbDisconnect(conn)
+#conn <- dbConnect(drv = PostgreSQL(), dbname = "sdad", 
+#                  host = "10.250.124.195", port = 5432, 
+#                  user = Sys.getenv("db_userid"), 
+#                  password = Sys.getenv("db_pwd"))
+#readme_raw_data <- dbGetQuery(conn, "select * from gh_2007_2020.readme_data;")
+#dbDisconnect(conn)
 
  
 # ingested dictionary, filter to categories, convert to strings  #########################################################
@@ -48,7 +48,7 @@ database_servers <- software_types %>% filter(sub_type == "Database Engines/Serv
 
 # it gets annoying to go back to that csv each time so you can just add words to the string and then rerun your function 
 database_servers <- paste(c("\\b(?i)(zcx", database_servers$term, 
-                            "database mangement|databases|postgresql|postgres",
+                            "database management|solarwinds database|dbvisualizer|manageengine|oracle rdbms|ibm db2|microsoft sql|sap sybase ase|teradata|adabas|mysql|filemaker|microsoft access|informix|sqlite|postgresql|amazonrds|mongodb|rdeis|couchdb|neo4j|couchbase|orientdb|phpmyadmin|sql developer|seqel pro|robomongo|hadoop hdfs|cloudera|mariadb|informix dynamic server|altibase",
                             "zcx)\\b"), collapse = "|")
 
 # and then if you want to output your updated string and paste it back to the csv you can do it with this 
@@ -98,6 +98,9 @@ conn <- dbConnect(drv = PostgreSQL(), dbname = "sdad",
 dbWriteTable(conn, c("gh_2007_2020", "readmes_classified"), 
              readme_classified, row.names = FALSE)
 dbDisconnect(conn)
+
+# links to help classify 
+# https://www.softwaretestinghelp.com/database-management-software/ 
 
 
 # references 
