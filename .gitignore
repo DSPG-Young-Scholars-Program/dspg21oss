@@ -9,13 +9,13 @@
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 
-*.csv
+
 *.xlsx
 *.xls
 *.RDS
 
  
 
-/data/dspg21oss/ 
+/data/
 *cache*
 */*/.ipynb_checkpoints/*
