@@ -7,4 +7,4 @@ Please refer to [this document](https://docs.github.com/en/github/authenticating
 You will need to select the scopes for this personal token, please refer to the following image.
 ![plot](./output/oss_token_setup.png)
 
-Please private message Crystal or Stephanie your access token and make sure you delete the message afterwards. 
+Please private message Crystal or Stephanie your access token and username, and make sure you delete the message afterwards. 
