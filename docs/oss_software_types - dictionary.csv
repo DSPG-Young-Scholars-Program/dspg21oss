@@ -1,0 +1,18 @@
+summary_type,main_type,sub_type,term
+Application,Blockchain,Crytocurrency,bitcoin
+Application,Blockchain,Crytocurrency,dogecoin
+Application,Blockchain,,etherium
+Application,Blockchain,,blockchain
+Application,Communications,Chat,signal
+Application,Games,Flight simulators,flightgear
+Application,Games,Board games,vassal
+Application,Database Management,Database Engines/Servers,postgresql
+Application,Database Management,Database Engines/Servers,mysql
+Application,Database Management,Database Engines/Servers,nosql
+Programming,,,python
+Programming,,,stata
+Programming,,,spss
+Programming,,,julia
+System,,,bios
+Utility,,,antivirus
+Utility,,,diskcleaner
