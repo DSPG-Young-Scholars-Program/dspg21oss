@@ -22,11 +22,11 @@ Please refer to [this document](https://docs.github.com/en/github/authenticating
 For step 6 and 7, please refer to the following image.
 ![plot](./output/oss_token_setup.png)
 
-Please private message Crystal or Stephanie your 
+Please private message the team:
 - access token 
 - username <br />
 
-and make sure you delete the message (not the access token) afterwards. 
+and make sure you delete the message (not the access token) afterwards. (Ex. if you messaged us on teams, you should delete that message.)
 
 *We appreciate your help!* 
 
