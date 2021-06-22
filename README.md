@@ -1,4 +1,16 @@
-# dspg21oss
+# Defining and Measuring the Universe of Open Source Software Innovation
+
+Data Science for Public Good summer program 2021
+
+## Research Question
+
+- In what ways can repositories be efficiently classified into “types” (e.g., operating systems, network services, database management, development tools, blockchain, etc.)? What information (e.g., tags, repos stats, or READMEs) is most helpful for classifying existing repositories? 
+
+- How does GitHub activity change based on the type of software being developed? Which types of software have the most contributors? Which types of software requires more commits, additions or deletions? 
+
+- How do different types of software affect collaboration tendencies? How do these tendencies change across the academic, business, or government sectors?
+
+
 ## Collect Access Token 
 
 *This won't take longer than 5 min.* 
@@ -17,3 +29,10 @@ Please private message Crystal or Stephanie your
 and make sure you delete the message (not the access token) afterwards. 
 
 *We appreciate your help!* 
+
+
+## Project Sponsor
+National Center for Science and Engineering Statistics (NCSES)
+- Carol Robbins, Senior Economist
+- Ledia Guci, Science Resources Analyst
+
