@@ -4,7 +4,6 @@ library(tidytext)
 library(wordcloud)
 
 # read in File
-#readmes <- read_csv("~/test/oss/readme_test_data.csv")
 readmes <- read_csv("/project/class/bii_sdad_dspg/ncses_oss_2021/requests_scrape/oss_readme_aggregated/oss_readme_data_062121.csv")
 
 # filtering
@@ -13,7 +12,8 @@ readmes_filtered <- readmes_filtered[readmes_filtered$readme_text != "404 ERROR 
 
 # tokenizing single words ####
 tidy_readmes <- readmes_filtered %>% 
-  unnest_tokens(word, readme_text)
+  unnest_tokens(word, readme_text) %>% 
+  count(slug, word)
 
 # remove stop words
 data(stop_words)
@@ -21,7 +21,7 @@ data(stop_words)
 tidy_readmes <- tidy_readmes %>% 
   anti_join(stop_words)
 
-#remove numbers
+# remove numbers
 nums <- tidy_readmes %>% 
   filter(str_detect(word, "^[0-9]")) %>% 
   select(word) %>% 
@@ -30,12 +30,16 @@ nums <- tidy_readmes %>%
 tidy_readmes <- tidy_readmes %>% 
   anti_join(nums, by = "word")
 
-# word counts
+# tf-idf
+readmes_tf_idf <- tidy_readmes %>% 
+  bind_tf_idf(word, n)
+
+# word counts ####
 word_counts <- tidy_readmes %>%
   count(word, sort = T) 
 
 # clean up a few words
-drop_words <- c("https", "github.com", "http")
+drop_words <- c("https", "github.com", "http", "github", "git", "sourcethemes.com")
 word_counts <- word_counts[!(word_counts$word %in% drop_words),]
 
 word_counts_10 <- word_counts[1:10,]
@@ -46,8 +50,8 @@ word_counts_10 %>%
   geom_col()
 
 # a lil word cloud action
-wordcloud(words=word_counts$word, freq = word_counts$n, max.words = 150, 
-          random.order = F)
+wordcloud(words=word_counts$word, freq = word_counts$n, max.words = 200, 
+          random.order = F, colors="#F84C1E")
 
 
 # tokenizing bigrams ####
