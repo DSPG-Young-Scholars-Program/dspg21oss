@@ -2,6 +2,7 @@
 library(tidyverse)
 library(tidytext)
 library(wordcloud)
+library(stringr)
 
 # read in File
 #readmes <- read_csv("~/test/oss/readme_test_data.csv")
@@ -11,13 +12,15 @@ readmes <- read_csv("/project/class/bii_sdad_dspg/ncses_oss_2021/requests_scrape
 readmes_filtered <- readmes[readmes$status == "Done", ]
 readmes_filtered <- readmes_filtered[readmes_filtered$readme_text != "404 ERROR - NO README", ]
 
+# remove symbols
+readmes_filtered$readme_text <- str_replace_all(readmes_filtered$readme_text,"[^[:alnum:]]", " ")
+
 # tokenizing single words ####
 tidy_readmes <- readmes_filtered %>% 
   unnest_tokens(word, readme_text)
 
 # remove stop words
 data(stop_words)
-
 tidy_readmes <- tidy_readmes %>% 
   anti_join(stop_words)
 
@@ -26,11 +29,35 @@ nums <- tidy_readmes %>%
   filter(str_detect(word, "^[0-9]")) %>% 
   select(word) %>% 
   unique()
-
 tidy_readmes <- tidy_readmes %>% 
   anti_join(nums, by = "word")
 
-# word counts
+
+# remove words that are not useful
+remove_words <- c("http","https","github","github.com","gt","copyright","install","branch","free")
+remove_words <- as_tibble(remove_words)
+remove_words<- remove_words %>% 
+  rename(word=value)
+tidy_readmes <- tidy_readmes %>% 
+  anti_join(remove_words, by = "word")
+
+
+# nest words
+tidy_readmes <- tidy_readmes %>% 
+  nest(word)
+
+tidy_readmes <- tidy_readmes %>% 
+  rename(tokens = data)
+
+# flatten the list of tokens
+tidy_readmes <- tidy_readmes %>% 
+  rowwise() %>% 
+  mutate_if(is.list, ~paste(unlist(.), collapse = ','))
+            
+# put csv in dspg21oss/data/dspg21osss
+write_csv(tidy_readmes,"/home/dab3dj/git/dspg21oss/data/dspg21oss/tokenized_readmes.csv")
+
+# word counts ####
 word_counts <- tidy_readmes %>%
   count(word, sort = T) 
 

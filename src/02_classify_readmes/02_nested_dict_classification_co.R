@@ -26,7 +26,8 @@ readme_raw_data <- read_csv("readme_test_data.csv") %>%
 # ingested dictionary, filter to categories, convert to strings  #########################################################
 
 # ingest nested dictionary
-software_types <- read_csv("~/oss_software_types - dictionary.csv") 
+#software_types <- read_csv("~/oss_software_types - dictionary.csv") 
+software_types <- read_csv("~/git/dspg21oss/docs/oss_software_types - dictionary - co.csv")
 
 # based on summary type 
 utility <- software_types %>% filter(summary_type == "Utility")
@@ -117,7 +118,41 @@ database_servers <- paste(c("\\b(?i)(zcx", database_servers$term,
                             "database mangement|databases|postgresql|postgres",
                             "zcx)\\b"), collapse = "|")
 
-# based on sub_type
+# from source forge
+
+windows_terms <- c("windows","antimicro", "scptoolkit", "scrollout f1", "7-zip", "scrcpy","rufus",
+                   "turbovnc","etcher", "desmume","webmin","libusb","gparted","win32 disk imager",
+                   "windows directory statistics", "net-snmp","ds4windows","asuswrt-merlin",
+                   "gpt fdisk","process hacker", "visualboyadvance","darik's book and nuke","opentrack",
+                   "ventoy", "vjoy", "s.m.a.r.t. monitoring tools","nullsoft scriptable","ophcrack",
+                   "v2ray","double commander","catacombae","reactos","ext2","boot-repair-disk",
+                   "blissos-dev","waircut","nikkho","refind","magisk","ext2read","angry ip scanner",
+                   "iperf","grub2win","gns3","nestopia","algo vpn")
+
+linux_terms <- c("linux","antimicro","scrollout f1","ubuntuzilla","scrcpy","rufus","turbovnc","autoap","etcher",
+                 "desmume","webmin","libusb","gparted","intel ethernet","zorin","xz utils","openmediavault",
+                 "mx-linux","net-snmp","cracklib","asuswrt-merlin","gpt fdisk","visualboyadvance",
+                 "darik's book and nuke","opentrack","ventoy","s.m.a.r.t. monitoring tools","ext2",
+                 "hdparm","clonezilla","squashfs","ophcrack","v2ray","double commander","catacombae",
+                 "reactos","p7zip","boot-repair-disk","blissos-dev","refind","procps-ng")
+
+mac_terms <- c("mac","scrollout f1","scrcpy","turbovnc","info-zip project","webmin","desmume","libusb","gparted",
+               "etcher","asuswrt-merlin","gpt fdisk","darik's book and nuke","opentrack","visualboyadvance",
+               "s.m.a.r.t. monitoring tools","reactos","double commander","catacombae","v2ray","blissos-dev",
+               "boot-repair-disk","angry ip scanner","refind","magisk","iperf","gns3","zabbix","macos","algo vpn",
+               "grandperspective","retroarch","docfetcher","iometer","veracrypt","boch x86 pc emulator","ghostscript fonts",
+               "drawio-desktop","gsmartcontrol","powershell","lxpup","gutenprint","voodoohda","macintosh os")
+
+# write terms to csv
+  
+
+# and then if you want to output your updated string and paste it back to the csv you can do it with this 
+vector_to_unnest <- "database mangement|databases"
+vector_to_unnest <- data.frame(unlist(strsplit(vector_to_unnest, "\\|")))
+colnames(vector_to_unnest) <- "terms"
+write_csv(vector_to_unnest, str_c(path_for_data, "terms_to_update.csv"))
+
+# based on sub_type ####
 # cryptocurrency <- software_types %>% filter(sub_type == "Crytocurrency")
 cryptocurrency <- paste(c("\\b(?i)(zcx", cryptocurrency$terms, "zcx)\\b"), collapse = "|")
 database_servers <- software_types %>% filter(sub_type == "Database Engines/Servers")
@@ -192,3 +227,5 @@ dbDisconnect(conn)
 # references 
 # https://github.com/brandonleekramer/diversity/blob/master/src/02_text_trends/04_hypothesis4.R
 # https://github.com/uva-bi-sdad/oss-2020/blob/master/src/07_ncses-indicators/02_intl_collaborations/02_github-users-to-ctry.Rmd 
+
+
