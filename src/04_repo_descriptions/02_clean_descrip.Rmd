@@ -1,74 +1,96 @@
+---
+title: "02_clean_descrip"
+author: "Crystal"
+date: "7/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
 # load packages
 library(tidyverse)
 library(tidytext)
 library(wordcloud)
 library(stringr)
+library(RPostgres)
+```
 
+```{r}
 # read in File
-readmes <- read_csv("/project/class/bii_sdad_dspg/ncses_oss_2021/requests_scrape/oss_readme_aggregated/oss_readme_data_062121.csv")
+conn <- dbConnect(drv = Postgres(), 
+                  dbname = "sdad", 
+                  host = "10.250.124.195", 
+                  port = 5432, 
+                  user = Sys.getenv(x="db_userid"), 
+                  password = Sys.getenv(x="db_pwd"))
+
+raw_data <- dbGetQuery(conn, "select slug, description, status from gh_2007_2020.repos where commits > 100;")
+
+dbDisconnect(conn=conn)
+```
+
+
+```{r}
 
 # filtering
-readmes_filtered <- readmes[readmes$status == "Done", ]
-readmes_filtered <- readmes_filtered[readmes_filtered$readme_text != "404 ERROR - NO README", ]
+desc_filtered <- raw_data%>%
+  filter(status == "Done")%>%
+  filter(!is.na(description))
 
 # remove symbols
-readmes_filtered$readme_text <- str_replace_all(readmes_filtered$readme_text,"[^[:alnum:]]", " ")
+desc_filtered$description <- str_replace_all(desc_filtered$descrition,"[^[:alnum:]]", " ")
 
 # tokenizing single words ####
-tidy_readmes <- readmes_filtered %>% 
-  unnest_tokens(word, readme_text) %>% 
-  count(slug, word)
+tidy_desc <- desc_filtered %>% 
+  unnest_tokens(word, description)
 
 # remove stop words
 data(stop_words)
-tidy_readmes <- tidy_readmes %>% 
+tidy_desc <- tidy_desc %>% 
   anti_join(stop_words)
 
-# remove numbers
-nums <- tidy_readmes %>% 
+#remove numbers
+nums <- tidy_desc %>% 
   filter(str_detect(word, "^[0-9]")) %>% 
   select(word) %>% 
   unique()
-tidy_readmes <- tidy_readmes %>% 
+tidy_desc <- tidy_desc %>% 
   anti_join(nums, by = "word")
 
 
-
 # remove words that are not useful
-remove_words <- c("http","https","github","github.com","gt","copyright","install","branch","free")
+remove_words <- c("http","https","github","github.com","gt","copyright","install","branch","free", 
+                  "www")
 remove_words <- as_tibble(remove_words)
 remove_words<- remove_words %>% 
   rename(word=value)
-tidy_readmes <- tidy_readmes %>% 
+tidy_desc <- tidy_desc %>% 
   anti_join(remove_words, by = "word")
 
 
 # nest words
-tidy_readmes <- tidy_readmes %>% 
-  nest(word)
-
-tidy_readmes <- tidy_readmes %>% 
-  rename(tokens = data)
-
-# flatten the list of tokens
-tidy_readmes <- tidy_readmes %>% 
+tidy_desc <- tidy_desc %>% 
+  nest(word)%>% 
+  rename(tokens = data)%>% # flatten the list of tokens
   rowwise() %>% 
   mutate_if(is.list, ~paste(unlist(.), collapse = ','))
             
 # put csv in dspg21oss/data/dspg21osss
-write_csv(tidy_readmes,"/home/dab3dj/git/dspg21oss/data/dspg21oss/tokenized_readmes.csv")
+#write_csv(tidy_desc,"/home/zz3hs/git/dspg21oss/data/dspg21oss/tokenized_description.csv")
 
-# tf-idf
-readmes_tf_idf <- tidy_readmes %>% 
-  bind_tf_idf(word, n)
+```
 
 
+```{r}
 # word counts ####
-word_counts <- tidy_readmes %>%
+word_counts <- tidy_desc %>%
   count(word, sort = T) 
 
 # clean up a few words
-drop_words <- c("https", "github.com", "http", "github", "git", "sourcethemes.com")
+drop_words <- c("https", "github.com", "http")
 word_counts <- word_counts[!(word_counts$word %in% drop_words),]
 
 word_counts_10 <- word_counts[1:10,]
@@ -79,8 +101,8 @@ word_counts_10 %>%
   geom_col()
 
 # a lil word cloud action
-wordcloud(words=word_counts$word, freq = word_counts$n, max.words = 200, 
-          random.order = F, colors="#F84C1E")
+wordcloud(words=word_counts$word, freq = word_counts$n, max.words = 150, 
+          random.order = F)
 
 
 # tokenizing bigrams ####
@@ -105,3 +127,5 @@ readmes_bigrams <- readmes_bigrams %>%
 
 readmes_bigrams %>% 
   count(word1, word2, sort=T)
+```
+
