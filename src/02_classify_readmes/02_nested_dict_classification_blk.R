@@ -7,9 +7,9 @@ library(maditr)
 library(RPostgreSQL)
 
 # ingest data locally from csv 
-path_for_data = "~/git/dspg21oss/data/readme_data/"
+path_for_data = "/project/class/bii_sdad_dspg/ncses_oss_2021/requests_scrape/oss_readme_aggregated/"
 setwd(path_for_data)
-readme_raw_data <- read_csv("oss_readme_data_061521.csv") %>% 
+readme_raw_data <- read_csv("oss_readme_data_062321.csv") %>% 
   filter(status == "Done") %>% 
   distinct(slug, readme_text, batch, as_of, status)
            
