@@ -3,6 +3,16 @@ rm(list=ls())
 library("dplyr")
 library("readr")
 
+# getting topics classified in dictionary
+topics_df <- read_csv("~/github_topics_classified_070721.csv")
+topics <- topics_df %>% 
+  filter(summary_type=="System" & is.na(main_type) & sub_type=="Networking")
+
+topics <- topics$term
+topics <- paste(topics, collapse="|")
+# run this to print terms
+str_replace_all(topics,"'", "")
+
 # Read in readme data
 path_for_data = "/project/class/bii_sdad_dspg/ncses_oss_2021/requests_scrape/oss_readme_aggregated/"
 setwd(path_for_data)
