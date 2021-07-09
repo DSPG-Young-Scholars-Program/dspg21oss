@@ -10,9 +10,12 @@ library(cld2)
 library(textcat)
 #library(tidyverse)
 library(maditr)
+library(extrafont)
+library(stargazer)
 
 
 #### 1: database table(s)
+
 conn <- dbConnect(drv = Postgres(), 
                   dbname = "sdad", 
                   host = "10.250.124.195", 
@@ -20,41 +23,59 @@ conn <- dbConnect(drv = Postgres(),
                   user = Sys.getenv(x="db_userid"), 
                   password = Sys.getenv(x="db_pwd"))
 
-raw_data <- dbGetQuery(conn, "select description, primarylanguage from gh_2007_2020.repos limit 10000;")
+raw_data <- dbGetQuery(conn, "select description, primarylanguage from gh_2007_2020.repos;")
 
 dbDisconnect(conn=conn)
+raw_data<-as.data.table(raw_data)
 raw_data_backup<-raw_data
 
 #raw_data<-raw_data_backup
 
-software_types <- read_csv("docs/oss_software_types - dictionary.csv") 
+software_types <- fread("docs/oss_software_types - dictionary.csv") 
 
 #### 2: coding language
 code_lang_count<-as.data.table(table(raw_data$primarylanguage)) %>% arrange.(desc(N))
-head(code_lang_count, n=10)
+head(code_lang_count, n=12)
+
 
 #TO-DO: MAKE VIZ
+
+stargazer(code_lang_count[1:10, ], summary=FALSE, rownames=FALSE)
+
+ggplot(code_lang_count[1:10, ], aes(x=reorder(V1, -N), y=N))+geom_bar(stat="identity", fill=rgb(44, 60, 67, maxColorValue = 256))+
+  ggtitle("Coding Languages (Top 10)")+ xlab("Coding Language")+ylab("Count")+theme_classic()+
+  theme(plot.title = element_text(size=28), axis.title.x = (element_text(size=15)), axis.title.y = (element_text(size=15)), axis.text=(element_text(size=12)), text=element_text(family="Franklin Gothic Book"))
 
 #### 3: descriptions, processing
 
 #any way to identify language? definitely descriptions in other languages
 #UPDATE: cld2 seems to be the best at detecting english, cld3 seems to be better at detecting other language (definitely not perfect)
 raw_data$lang_cld3<-lapply(raw_data$description, cld3::detect_language)
-raw_data$lang_textcat<-lapply(raw_data$description, textcat)
+#raw_data$lang_textcat<-lapply(raw_data$description, textcat)
 raw_data$lang_cld2<-lapply(raw_data$description, cld2::detect_language)
-
-raw_data<-as.data.table(raw_data)
 
 
 #filter out english entries (removes about 60%, kept 5742/10000, 1084/10000 are non-english, the rest have no description)
+raw_data$lang_cld2<-paste(raw_data$lang_cld2, collapse="/") %>% str_split("/")
+raw_data$lang_cld3<-paste(raw_data$lang_cld3, collapse="/") %>% str_split("/")
+
+raw_desc<-raw_data %>% filter.(is.na(description)==FALSE) 
+
+cld2_total<-as.data.table(table(raw_desc$lang_cld2)) %>% arrange.(desc(N))
+cld3_total<-as.data.table(table(raw_desc$lang_cld3)) %>% arrange.(desc(N))
+total_lang<-left_join.(cld2_total, cld3_total, "V1") %>% arrange.(desc(N))
+colnames(total_lang)<-c("Language", "cld3", "cld2")
+
+stargazer(total_lang[1:8, ], summary=FALSE)
+#viz
+ggplot(total_lang[1:6,], aes(x=Language, y=cld2))+geom_bar(position="dodge", stat="identity")
+
+
 english_description<- raw_data %>% filter.(lang_cld2=="en"|lang_cld3=="en") %>% select.("description", "primarylanguage") 
 
 non_english_description<-anti_join.(raw_data, english_description, by="description") %>% 
   filter.(is.na(description)==FALSE) %>% 
   select.("description", "primarylanguage", "lang_cld3", "lang_cld2")
-
-non_english_description$lang_cld2<-paste(non_english_description$lang_cld2, collapse="/") %>% str_split("/")
-non_english_description$lang_cld3<-paste(non_english_description$lang_cld3, collapse="/") %>% str_split("/")
 
 cld3_count<-as.data.table(table(non_english_description$lang_cld3)) %>% arrange.(desc(N))
 cld2_count<-as.data.table(table(non_english_description$lang_cld2)) %>% arrange.(desc(N))
@@ -88,8 +109,11 @@ processed_description$description<-iconv(processed_description$description, "UTF
 utility <- software_types %>% filter(summary_type == "Utility")
 utility <- paste(c("\\b(?i)(zcx", utility$terms, "zcx)\\b"), collapse = "|")
 
-programming<-software_types %>% filter(summary_type=="Programming")
+programming<-software_types %>% filter.(summary_type=="Programming")
 programming<-paste(c("\\b(?i)(zcx", programming$terms, "zcx)\\b"), collapse = "|")
+
+#programming<-programming %>% filter.(sub_type=="R"|sub_type=="Python"|sub_type=="SPSS"|sub_type=="SAS"|sub_type=="Scala"|sub_type=="Julia") %>% mutate.(main_type="Statistical")
+programming[, main_type:=ifelse(sub_type=="R"|sub_type=="Python"|sub_type=="SPSS"|sub_type=="SAS"|sub_type=="Scala"|sub_type=="Julia", "Statistical Software", NA)]
 
 ## based on main_type 
 blockchain <- software_types %>% filter(main_type == "Blockchain")
