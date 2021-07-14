@@ -294,7 +294,7 @@ detect_prog_gen_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   prog_clojure <- get_dictionary_terms(sub_type = "Clojure") 
   prog_ocaml <- get_dictionary_terms(sub_type = "OCaml")
   prog_dotnet <- get_dictionary_terms(sub_type = ".NET")
-  prog_vbdotnet <- get_dictionary_terms(sub_type = "Virtual Basic .NET")
+  prog_vbdotnet <- get_dictionary_terms(sub_type = "Visual Basic .NET")
   prog_fsharp <- get_dictionary_terms(sub_type = "F#")
   prog_fortran <- get_dictionary_terms(sub_type = "Fortran") # from ibm 
   prog_commonlisp <- get_dictionary_terms(sub_type = "Common Lisp")
