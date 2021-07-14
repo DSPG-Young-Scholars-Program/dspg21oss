@@ -138,7 +138,7 @@ all_classified_data <- readme_subset_data %>%
   left_join(classified_with_desciptions, by = "slug") %>%
   left_join(classified_with_primarylang, by = "slug") %>% 
   left_join(classified_with_readmes, by = "slug") %>% 
-  left_join(classified_with_topics, by = "slug")
+  left_join(classified_with_topics, by = "slug") 
 
 #### stat prog langs #####################################################################################
 
