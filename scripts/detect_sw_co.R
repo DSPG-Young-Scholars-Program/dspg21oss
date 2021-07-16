@@ -244,3 +244,231 @@ detect_utility_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   df
   
 }
+
+detect_application_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  library("dplyr")
+  library("readr")
+  library("tidyr")
+  library("readr")
+  library("stringr")
+  library("data.table")
+  library("tidytext")
+  library("tidytable")
+  
+  app_general <- get_dictionary_terms(summary_type = "Application", main_type = F, sub_type = F)
+  app_mobile <- get_dictionary_terms(main_type = "Mobile")
+  app_database <- get_dictionary_terms(main_type = "Database")
+  app_blockchain <- get_dictionary_terms(main_type = "Blockchain")
+  app_comm <- get_dictionary_terms(main_type = "Communications")
+  app_texted <- get_dictionary_terms(main_type = "Text Editors")
+  app_games <- get_dictionary_terms(main_type = "Games/Entertainment")
+  app_deskenvi <- get_dictionary_terms(main_type = "Desktop Environments")
+  app_formats <- get_dictionary_terms(main_type = "Formats/Protocols")
+  app_crypto <- get_dictionary_terms(sub_type = "Crytocurrency")
+  app_databaseeng <- get_dictionary_terms(sub_type = "Database Engines/Servers")
+  app_vim <- get_dictionary_terms(sub_type = "Vi/Vim")
+  app_emacs <- get_dictionary_terms(sub_type = "Emacs")
+  app_chat <- get_dictionary_terms(sub_type = "Chat")
+  app_devenvi <- get_dictionary_terms(sub_type = "Integrated Development Environments")
+  app_protocols <- get_dictionary_terms(sub_type = "Protocols")
+  app_graphdb <- get_dictionary_terms(sub_type = "Graph Databases")
+  app_gamedev <- get_dictionary_terms(sub_type = "Game Development Frameworks")
+  app_frontends <- get_dictionary_terms(sub_type = "Front-Ends")
+  
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, app_general) %>% 
+    detect_types(!!id, !!input, app_mobile) %>% 
+    detect_types(!!id, !!input, app_database) %>% 
+    detect_types(!!id, !!input, app_blockchain) %>% 
+    detect_types(!!id, !!input, app_comm) %>% 
+    detect_types(!!id, !!input, app_texted) %>% 
+    detect_types(!!id, !!input, app_games) %>% 
+    detect_types(!!id, !!input, app_deskenvi) %>% 
+    detect_types(!!id, !!input, app_formats) %>%
+    detect_types(!!id, !!input, app_crypto) %>% 
+    detect_types(!!id, !!input, app_databaseeng) %>% 
+    detect_types(!!id, !!input, app_vim) %>% 
+    detect_types(!!id, !!input, app_emacs) %>% 
+    detect_types(!!id, !!input, app_chat) %>% 
+    detect_types(!!id, !!input, app_devenvi) %>% 
+    detect_types(!!id, !!input, app_protocols) %>% 
+    detect_types(!!id, !!input, app_graphdb) %>% 
+    detect_types(!!id, !!input, app_gamedev) %>% 
+    detect_types(!!id, !!input, app_frontends)
+  
+  df <- df %>% 
+    as.data.frame() %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(app_all = sum(across(contains("app_")), na.rm = TRUE))
+  
+  if( sum_only == TRUE ){
+    
+    df <- df %>% select(-starts_with("app_"))
+    
+  } else { df }
+  
+  if( prob == TRUE ){
+    
+    tmp_df <- readme_raw_data %>% 
+      as.data.frame() %>% 
+      tidytext::unnest_tokens(word, !!input) %>%
+      as_tidytable() %>% 
+      tidytable::count.(!!id, name = "n_words")
+    
+  } else { df }
+  
+  df
+  
+}
+
+detect_database_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  library("dplyr")
+  library("readr")
+  library("tidyr")
+  library("readr")
+  library("stringr")
+  library("data.table")
+  library("tidytext")
+  library("tidytable")
+  
+  db_general <- get_dictionary_terms(main_type = "Database", sub_type = F)
+  db_engine <- get_dictionary_terms(main_type = "Database Engines/Servers")
+  db_graph <- get_dictionary_terms(sub_type = "Graph Databases")
+  db_frontends <- get_dictionary_terms(sub_type = "Front-Ends")
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, db_general) %>% 
+    detect_types(!!id, !!input, db_engine) %>% 
+    detect_types(!!id, !!input, db_graph) %>% 
+    detect_types(!!id, !!input, db_frontends) 
+  
+  df <- df %>% 
+    as.data.frame() %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(db_all = sum(across(contains("db_")), na.rm = TRUE))
+  
+  if( sum_only == TRUE ){
+    
+    df <- df %>% select(-starts_with("db_"))
+    
+  } else { df }
+  
+  if( prob == TRUE ){
+    
+    tmp_df <- readme_raw_data %>% 
+      as.data.frame() %>% 
+      tidytext::unnest_tokens(word, !!input) %>%
+      as_tidytable() %>% 
+      tidytable::count.(!!id, name = "n_words")
+    
+  } else { df }
+  
+  df
+  
+}
+
+
+detect_ai_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  library("dplyr")
+  library("readr")
+  library("tidyr")
+  library("readr")
+  library("stringr")
+  library("data.table")
+  library("tidytext")
+  library("tidytable")
+  
+  ai <- get_dictionary_terms(sub_type = "Artificial Intelligence")
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, ai)  
+  
+  # df <- df %>% 
+  #   as.data.frame() %>% 
+  #   dplyr::rowwise() %>% 
+  #   dplyr::mutate(utility_all = sum(across(contains("util_")), na.rm = TRUE))
+  
+  # if( sum_only == TRUE ){
+  #   
+  #   df <- df %>% select(-starts_with("util_"))
+  #   
+  # } else { df }
+  # 
+  # if( prob == TRUE ){
+  #   
+  #   tmp_df <- readme_raw_data %>% 
+  #     as.data.frame() %>% 
+  #     tidytext::unnest_tokens(word, !!input) %>%
+  #     as_tidytable() %>% 
+  #     tidytable::count.(!!id, name = "n_words")
+  #   
+  # } else { df }
+  
+  df
+  
+}
+
+detect_viz_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  library("dplyr")
+  library("readr")
+  library("tidyr")
+  library("readr")
+  library("stringr")
+  library("data.table")
+  library("tidytext")
+  library("tidytable")
+  
+  viz <- get_dictionary_terms(sub_type = "Visualization")
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, viz)  
+  
+  # df <- df %>% 
+  #   as.data.frame() %>% 
+  #   dplyr::rowwise() %>% 
+  #   dplyr::mutate(utility_all = sum(across(contains("util_")), na.rm = TRUE))
+  
+  # if( sum_only == TRUE ){
+  #   
+  #   df <- df %>% select(-starts_with("util_"))
+  #   
+  # } else { df }
+  # 
+  # if( prob == TRUE ){
+  #   
+  #   tmp_df <- readme_raw_data %>% 
+  #     as.data.frame() %>% 
+  #     tidytext::unnest_tokens(word, !!input) %>%
+  #     as_tidytable() %>% 
+  #     tidytable::count.(!!id, name = "n_words")
+  #   
+  # } else { df }
+  
+  df
+  
+}
