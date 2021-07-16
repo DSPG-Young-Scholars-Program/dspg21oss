@@ -95,9 +95,8 @@ detect_types <- function(df, id, input, terms){
   id <- enquo(id)
   
   tmp_df <- df %>% 
-    as.data.frame() %>% 
-    tidytext::unnest_tokens(word, !!input) %>%
     as_tidytable() %>% 
+    tidytext::unnest_tokens(word, !!input) %>%
     tidytable::filter.(word %in% terms) %>% 
     tidytable::mutate.("{{output}}" := 1) %>% 
     tidytable::select.(-word) %>% 
@@ -109,58 +108,6 @@ detect_types <- function(df, id, input, terms){
     as.data.frame()
   
   df
-}
-
-detect_blockchain_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
-  
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
-  
-  # load dictionaries for top-50 languages based on: 
-  # https://madnight.github.io/githut/#/pull_requests/2021
-  
-  # top statistical languages 
-  app_blockchain <- get_dictionary_terms(main_type = "Blockchain")
-  app_crypocurrency <- get_dictionary_terms(sub_type = "Cryptocurrency")
-  
-  id <- enquo(id)
-  input <- enquo(input)
-  
-  df <- df %>% 
-    as_tidytable() %>% 
-    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
-    detect_types(!!id, !!input, app_blockchain) %>% 
-    detect_types(!!id, !!input, app_crypocurrency) 
-  
-  df <- df %>% 
-    as.data.frame() %>% 
-    dplyr::rowwise() %>% 
-    dplyr::mutate(app_blockchain_all = sum(across(contains("app_")), na.rm = TRUE))
-  
-  if( sum_only == TRUE ){
-    
-    df <- df %>% select(-starts_with("app_"))
-    
-  } else { df }
-  
-  if( prob == TRUE ){
-    
-    tmp_df <- readme_raw_data %>% 
-      as.data.frame() %>% 
-      tidytext::unnest_tokens(word, !!input) %>%
-      as_tidytable() %>% 
-      tidytable::count.(!!id, name = "n_words")
-    
-  } else { df }
-  
-  df
-  
 }
 
 # detect_subcategory is a function embedded within the software_type detector that 
@@ -182,9 +129,8 @@ detect_types <- function(df, id, input, terms){
   id <- enquo(id)
   
   tmp_df <- df %>% 
-    as.data.frame() %>% 
-    tidytext::unnest_tokens(word, !!input) %>%
     as_tidytable() %>% 
+    tidytext::unnest_tokens(word, !!input) %>%
     tidytable::filter.(word %in% terms) %>% 
     tidytable::mutate.("{{output}}" := 1) %>% 
     tidytable::select.(-word) %>% 
@@ -197,6 +143,198 @@ detect_types <- function(df, id, input, terms){
   
   df
 }
+
+
+# detect_blockchain_sw
+
+detect_blockchain_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  library("dplyr")
+  library("readr")
+  library("tidyr")
+  library("readr")
+  library("stringr")
+  library("data.table")
+  library("tidytext")
+  library("tidytable")
+  
+  # load dictionaries for top-50 languages based on: 
+  # https://madnight.github.io/githut/#/pull_requests/2021
+  
+  # top statistical languages 
+  app_blockchain <- get_dictionary_terms(main_type = "Blockchain")
+  app_cryptocurrency <- get_dictionary_terms(sub_type = "Cryptocurrency")
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, app_blockchain) %>% 
+    detect_types(!!id, !!input, app_cryptocurrency) 
+  
+  df <- df %>% 
+    as.data.frame() %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(app_blockchain_all = sum(across(contains("app_")), na.rm = TRUE))
+  
+  if( sum_only == TRUE ){
+    
+    df <- df %>% select(-app_blockchain, app_cryptocurrency)
+    
+  } else { df }
+  
+  if( prob == TRUE ){
+    
+    tmp_df <- readme_raw_data %>% 
+      as_tidytable() %>% 
+      tidytext::unnest_tokens(word, !!input) %>%
+      tidytable::count.(!!id, name = "n_words")
+    
+  } else { df }
+  
+  df
+  
+}
+
+# databases 
+
+detect_database_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  library("dplyr")
+  library("readr")
+  library("tidyr")
+  library("readr")
+  library("stringr")
+  library("data.table")
+  library("tidytext")
+  library("tidytable")
+  
+  # load dictionaries for top-50 languages based on: 
+  # https://madnight.github.io/githut/#/pull_requests/2021
+  
+  # top statistical languages 
+  app_db_general <- get_dictionary_terms(main_type = "Security")
+  app_db_frontends <- get_dictionary_terms(sub_type = "Front-Ends")
+  app_db_servers <- get_dictionary_terms(sub_type = "Database Engines/Servers")
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, app_db_general) %>% 
+    detect_types(!!id, !!input, app_db_frontends) %>% 
+    detect_types(!!id, !!input, app_db_servers) 
+  
+  df <- df %>% 
+    as.data.frame() %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(app_database_all = sum(across(contains("app_db_")), na.rm = TRUE))
+  
+  if( sum_only == TRUE ){
+    
+    df <- df %>% select(-starts_with("app_db_"))
+    
+  } else { df }
+  
+  if( prob == TRUE ){
+    
+    tmp_df <- readme_raw_data %>% 
+      as_tidytable() %>% 
+      tidytext::unnest_tokens(word, !!input) %>%
+      tidytable::count.(!!id, name = "n_words")
+    
+  } else { df }
+  
+  df
+  
+}
+
+# business software 
+
+detect_business_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  library("dplyr")
+  library("readr")
+  library("tidyr")
+  library("readr")
+  library("stringr")
+  library("data.table")
+  library("tidytext")
+  library("tidytable")
+  
+  # load dictionaries for top-50 languages based on: 
+  # https://madnight.github.io/githut/#/pull_requests/2021
+  
+  # top statistical languages 
+  app_bus_general <- get_dictionary_terms(main_type = "Office/Business")
+  app_bus_enterprise <- get_dictionary_terms(sub_type = "Enterprise")
+  app_bus_financial <- get_dictionary_terms(sub_type = "Financial")
+  app_bus_scheduling <- get_dictionary_terms(sub_type = "Scheduling")
+  app_bus_projmgmt <- get_dictionary_terms(sub_type = "Project Management")
+  app_bus_timetrack <- get_dictionary_terms(sub_type = "Time Tracking")
+  app_bus_todolists <- get_dictionary_terms(sub_type = "To-Do Lists")
+  app_bus_offsuites <- get_dictionary_terms(sub_type = "Office Suites")
+  app_bus_ecomm <- get_dictionary_terms(sub_type = "E-Commerce/Shopping")
+  app_bus_knowmgmt <- get_dictionary_terms(sub_type = "Knowledge Management")
+  app_bus_dsktoppub <- get_dictionary_terms(sub_type = "Desktop Publishing")
+  app_bus_reportgen <- get_dictionary_terms(sub_type = "Report Generators")
+  app_bus_modeling <- get_dictionary_terms(sub_type = "Modelling")
+  app_bus_insurance <- get_dictionary_terms(sub_type = "Insurance")
+  app_bus_mrktauto <- get_dictionary_terms(sub_type = "Marketing Automation")
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, app_bus_general) %>% 
+    detect_types(!!id, !!input, app_bus_enterprise) %>% 
+    detect_types(!!id, !!input, app_bus_financial) %>% 
+    detect_types(!!id, !!input, app_bus_scheduling) %>% 
+    detect_types(!!id, !!input, app_bus_projmgmt) %>% 
+    detect_types(!!id, !!input, app_bus_timetrack) %>% 
+    detect_types(!!id, !!input, app_bus_todolists) %>% 
+    detect_types(!!id, !!input, app_bus_offsuites) %>% 
+    detect_types(!!id, !!input, app_bus_ecomm) %>% 
+    detect_types(!!id, !!input, app_bus_knowmgmt) %>% 
+    detect_types(!!id, !!input, app_bus_dsktoppub) %>% 
+    detect_types(!!id, !!input, app_bus_reportgen) %>% 
+    detect_types(!!id, !!input, app_bus_modeling) %>% 
+    detect_types(!!id, !!input, app_bus_insurance) %>% 
+    detect_types(!!id, !!input, app_bus_mrktauto) 
+  
+  df <- df %>% 
+    as.data.frame() %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(app_business_all = sum(across(contains("app_bus_")), na.rm = TRUE))
+  
+  if( sum_only == TRUE ){
+    
+    df <- df %>% select(-starts_with("app_bus_"))
+    
+  } else { df }
+  
+  if( prob == TRUE ){
+    
+    tmp_df <- readme_raw_data %>% 
+      as.data.frame() %>% 
+      tidytext::unnest_tokens(word, !!input) %>%
+      as_tidytable() %>% 
+      tidytable::count.(!!id, name = "n_words")
+    
+  } else { df }
+  
+  df
+  
+}
+
+
+# detect_statprog_sw classifies statistical programming languages  
 
 detect_prog_stat_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
@@ -211,7 +349,7 @@ detect_prog_stat_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
   # load dictionaries for top-50 languages based on: 
   # https://madnight.github.io/githut/#/pull_requests/2021
-
+  
   # top statistical languages 
   prog_python <- get_dictionary_terms(sub_type = "Python")
   prog_scala <- get_dictionary_terms(sub_type = "Scala")
@@ -260,6 +398,7 @@ detect_prog_stat_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
 }
 
+# detect_prog_web_sw classifies web, application and gaming programming languages  
 
 detect_prog_web_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
@@ -275,7 +414,7 @@ detect_prog_web_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   # load dictionaries for top-50 languages based on: 
   # https://madnight.github.io/githut/#/pull_requests/2021
   
-  # top statistical languages 
+  # top web dev, app, gaming programming languages 
   prog_javascript <- get_dictionary_terms(sub_type = "JavaScript")
   prog_java <- get_dictionary_terms(sub_type = "Java")
   prog_typescript <- get_dictionary_terms(sub_type = "TypeScript")
@@ -343,8 +482,111 @@ detect_prog_web_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
 }
 
+# detect_prog_gen_sw classifies general and multipurpuse use programming languages
+
+detect_prog_gen_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  library("dplyr")
+  library("readr")
+  library("tidyr")
+  library("readr")
+  library("stringr")
+  library("data.table")
+  library("tidytext")
+  library("tidytable")
+  
+  # load dictionaries for top-50 languages based on: 
+  # https://madnight.github.io/githut/#/pull_requests/2021
+  
+  # top statistical languages 
+  #prog_general <- get_dictionary_terms(summary_type = "Programming")
+  prog_go <- get_dictionary_terms(sub_type = "Go")
+  prog_ruby <- get_dictionary_terms(sub_type = "Ruby")
+  prog_cpp <- get_dictionary_terms(sub_type = "C++")
+  prog_csharp <- get_dictionary_terms(sub_type = "C#")
+  prog_clang <- get_dictionary_terms(sub_type = "C")
+  prog_objc <- get_dictionary_terms(sub_type = "Objective-C")
+  prog_objcpp <- get_dictionary_terms(sub_type = "Objective-C++")
+  prog_rust <- get_dictionary_terms(sub_type = "Rust")
+  prog_perl <- get_dictionary_terms(sub_type = "Perl")
+  prog_swift <- get_dictionary_terms(sub_type = "Swift") # from apple 
+  prog_haskell <- get_dictionary_terms(sub_type = "Haskell")
+  prog_groovy <- get_dictionary_terms(sub_type = "Groovy") 
+  prog_clojure <- get_dictionary_terms(sub_type = "Clojure") 
+  prog_ocaml <- get_dictionary_terms(sub_type = "OCaml")
+  prog_dotnet <- get_dictionary_terms(sub_type = ".NET")
+  prog_vbdotnet <- get_dictionary_terms(sub_type = "Virtual Basic .NET")
+  prog_fsharp <- get_dictionary_terms(sub_type = "F#")
+  prog_fortran <- get_dictionary_terms(sub_type = "Fortran") # from ibm 
+  prog_commonlisp <- get_dictionary_terms(sub_type = "Common Lisp")
+  prog_coq <- get_dictionary_terms(sub_type = "Coq") # formal proof mgmt system
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    #detect_types(!!id, !!input, prog_general) %>% 
+    detect_types(!!id, !!input, prog_go) %>% 
+    detect_types(!!id, !!input, prog_ruby) %>% 
+    detect_types(!!id, !!input, prog_cpp) %>% 
+    detect_types(!!id, !!input, prog_csharp) %>% 
+    detect_types(!!id, !!input, prog_clang) %>% 
+    detect_types(!!id, !!input, prog_objc) %>% 
+    detect_types(!!id, !!input, prog_objcpp) %>% 
+    detect_types(!!id, !!input, prog_rust) %>% 
+    detect_types(!!id, !!input, prog_perl) %>% 
+    detect_types(!!id, !!input, prog_swift) %>% 
+    detect_types(!!id, !!input, prog_haskell) %>% 
+    detect_types(!!id, !!input, prog_groovy) %>% 
+    detect_types(!!id, !!input, prog_clojure) %>% 
+    detect_types(!!id, !!input, prog_ocaml) %>% 
+    detect_types(!!id, !!input, prog_dotnet) %>% 
+    detect_types(!!id, !!input, prog_vbdotnet) %>% 
+    detect_types(!!id, !!input, prog_fsharp) %>% 
+    detect_types(!!id, !!input, prog_fortran) %>% 
+    detect_types(!!id, !!input, prog_commonlisp) %>% 
+    detect_types(!!id, !!input, prog_coq) 
+  
+  df <- df %>% 
+    as.data.frame() %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(prog_gen_all = sum(across(contains("prog_")), na.rm = TRUE))
+  
+  if( sum_only == TRUE ){
+    
+    df <- df %>% select(-starts_with("prog_"))
+    
+  } else { df }
+  
+  if( prob == TRUE ){
+    
+    tmp_df <- readme_raw_data %>% 
+      as.data.frame() %>% 
+      tidytext::unnest_tokens(word, !!input) %>%
+      as_tidytable() %>% 
+      tidytable::count.(!!id, name = "n_words")
+    
+  } else { df }
+  
+  df
+  
+}
 
 
+
+
+
+
+
+
+
+
+
+
+
+# save this for later 
 
 
 detect_programming_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
@@ -485,137 +727,7 @@ detect_programming_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE)
   
 }
 
-detect_system_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
-  
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
-  
-  sys_general <- get_dictionary_terms(summary_type = "System")
-  sys_os <- get_dictionary_terms(main_type = "Operating Systems")
-  sys_windows <- get_dictionary_terms(sub_type = "Windows")
-  sys_linux <- get_dictionary_terms(sub_type = "Linux")
-  sys_mac <- get_dictionary_terms(sub_type = "Mac")
-  sys_modern <- get_dictionary_terms(sub_type = "Modern")
-  sys_bsd <- get_dictionary_terms(sub_type = "BSD")
-  sys_android <- get_dictionary_terms(sub_type = "Android")
-  sys_solaris <- get_dictionary_terms(sub_type = "Solaris")
-  sys_virtual <- get_dictionary_terms(sub_type = "Virtualization")
-  sys_handheld <- get_dictionary_terms(sub_type = "Handheld/Embedded Operating Systems")
-  sys_emulapi <- get_dictionary_terms(sub_type = "Emulation and API Compatability")
-  sys_grouping <- get_dictionary_terms(sub_type = "Grouping and Descriptive Categories")
-  sys_other <- get_dictionary_terms(sub_type = "Other Operating Systems")
-  
-  id <- enquo(id)
-  input <- enquo(input)
-  
-  df <- df %>% 
-    as_tidytable() %>% 
-    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
-    detect_types(!!id, !!input, sys_general) %>% 
-    detect_types(!!id, !!input, sys_os) %>% 
-    detect_types(!!id, !!input, sys_windows) %>% 
-    detect_types(!!id, !!input, sys_linux) %>% 
-    detect_types(!!id, !!input, sys_mac) %>% 
-    detect_types(!!id, !!input, sys_modern) %>% 
-    detect_types(!!id, !!input, sys_bsd) %>% 
-    detect_types(!!id, !!input, sys_android) %>% 
-    detect_types(!!id, !!input, sys_solaris) %>% 
-    detect_types(!!id, !!input, sys_virtual) %>% 
-    detect_types(!!id, !!input, sys_handheld) %>% 
-    detect_types(!!id, !!input, sys_emulapi) %>% 
-    detect_types(!!id, !!input, sys_grouping) %>%
-    detect_types(!!id, !!input, sys_other) 
-  
-  df <- df %>% 
-    as.data.frame() %>% 
-    dplyr::rowwise() %>% 
-    dplyr::mutate(system_all = sum(across(contains("sys_")), na.rm = TRUE))
-  
-  if( sum_only == TRUE ){
-    
-    df <- df %>% select(-starts_with("sys_"))
-    
-  } else { df }
-  
-  if( prob == TRUE ){
-    
-    tmp_df <- readme_raw_data %>% 
-      as.data.frame() %>% 
-      tidytext::unnest_tokens(word, !!input) %>%
-      as_tidytable() %>% 
-      tidytable::count.(!!id, name = "n_words")
-    
-  } else { df }
-  
-  df
-  
-}
 
-
-
-detect_utility_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
-  
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
-  
-  util_general <- get_dictionary_terms(summary_type = "Utility")
-  util_security <- get_dictionary_terms(main_type = "Security")
-  util_crypto <- get_dictionary_terms(sub_type = "Cryptography")
-  util_pwdmgr <- get_dictionary_terms(sub_type = "Password Manager")
-  util_malware <- get_dictionary_terms(sub_type = "Anti-Malware")
-  util_virus <- get_dictionary_terms(sub_type = "Anti-Virus")
-  util_spam <- get_dictionary_terms(sub_type = "Anti-Spam")
-
-  id <- enquo(id)
-  input <- enquo(input)
-  
-  df <- df %>% 
-    as_tidytable() %>% 
-    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
-    detect_types(!!id, !!input, util_general) %>% 
-    detect_types(!!id, !!input, util_security) %>% 
-    detect_types(!!id, !!input, util_crypto) %>% 
-    detect_types(!!id, !!input, util_pwdmgr) %>% 
-    detect_types(!!id, !!input, util_malware) %>% 
-    detect_types(!!id, !!input, util_virus) %>% 
-    detect_types(!!id, !!input, util_spam) 
-  
-  df <- df %>% 
-    as.data.frame() %>% 
-    dplyr::rowwise() %>% 
-    dplyr::mutate(utility_all = sum(across(contains("util_")), na.rm = TRUE))
-  
-  if( sum_only == TRUE ){
-    
-    df <- df %>% select(-starts_with("util_"))
-    
-  } else { df }
-  
-  if( prob == TRUE ){
-    
-    tmp_df <- readme_raw_data %>% 
-      as.data.frame() %>% 
-      tidytext::unnest_tokens(word, !!input) %>%
-      as_tidytable() %>% 
-      tidytable::count.(!!id, name = "n_words")
-    
-  } else { df }
-  
-  df
-  
-}
 
 
   
