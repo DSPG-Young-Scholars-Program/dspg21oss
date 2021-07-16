@@ -36,3 +36,44 @@ Kotlin: https://awesomeopensource.com/projects/kotlin-library
 
 lua: https://github.com/LewisJEllis/awesome-lua
 
+coffeescript: https://arcturo.github.io/library/coffeescript/06_applications.html
+
+erlang: https://github.com/drobakowski/awesome-erlang
+
+elixir: https://libraries.io/search?languages=Elixir&order=desc&sort=rank
+
+jsonet
+
+general, multipuprpose:
+go:https://www.geeksforgeeks.org/top-5-golang-frameworks-in-2020/
+https://awesomeopensource.com/projects/golang-package
+https://github.com/topics/go?o=desc&q=go+packages&s=stars
+
+ruby: https://rubygems.org/stats?page=2
+
+c++: https://www.techgeekbuzz.com/cpp-libraries/
+
+c#: https://visualstudiomagazine.com/articles/2019/12/03/top-csharp-libraries.aspx
+https://dotnet.libhunt.com/packages/c#
+
+groovy: https://libraries.io/search?languages=Groovy&order=desc&page=4&sort=stars
+
+perl: https://metacpan.org/favorite/leaderboard
+
+haskell: https://www.dummies.com/programming/10-must-have-haskell-libraries-for-functional-programming/
+https://serokell.io/blog/best-haskell-open-source-projects
+
+rust: https://awesomeopensource.com/projects/rust-library
+https://jondot.medium.com/12-killer-rust-libraries-you-should-know-c60bab07624f
+
+swift: https://swiftpack.co/
+
+objective-c: https://github.com/search?l=Objective-C&o=desc&p=3&q=objective-c&s=stars&type=Repositories (isolate repos that aren't used for other languages too)
+
+c: https://en.cppreference.com/w/c/links/libs
+
+ocaml: https://opam.ocaml.org/packages/index-popularity.html
+
+fortran: https://github.com/rabbiabram/awesome-fortran
+
+matlab: https://github.com/mikecroucher/awesome-MATLAB

@@ -1,9 +1,22 @@
+library(data.table)
+library(maditr)
+
 # load packages and data 
 rm(list=ls())
 library("dplyr")
 library("readr")
+library(stringr)
 path_for_data = "/project/class/bii_sdad_dspg/ncses_oss_2021/requests_scrape/oss_readme_aggregated/"
 setwd(path_for_data)
+
+classified<-read_csv("dspg21oss/github_topics_classified_070721.csv") 
+classified_programming_python<-classified %>% filter(summary_type=="Programming" & sub_type=="Python")
+classified_programming_python <- classified_programming_python$term
+classified_programming_python <- paste(classified_programming_python, collapse="|")
+# run this to print terms
+str_replace_all(classified_programming_python,"'", "")
+
+
 readme_raw_data <- read_csv("oss_readme_data_061521.csv") %>% 
   filter(status == "Done") %>% 
   distinct(slug, readme_text, batch, as_of, status)
