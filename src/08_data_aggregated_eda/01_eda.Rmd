@@ -1,0 +1,34 @@
+---
+title: "01_viz"
+author: "Crystal"
+date: "7/16/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list = ls())
+# load packages
+for (pkg in c("tidyverse", "data.table", "R.utils", "RPostgreSQL", "cowplot", "stringr", "stringi",  "dplyr", "leaflet", "leaflet.extras", "tools", "statebins")) {library(pkg, character.only = TRUE)}
+
+```
+
+```{r}
+conn <- dbConnect(drv = PostgreSQL(), 
+                  dbname = "sdad", 
+                  host = "10.250.124.195", 
+                  port = 5432, 
+                  user = Sys.getenv("db_userid"), 
+                  password = Sys.getenv("db_pwd"))
+
+# overwrite the pats_update table on pgAdmin
+repos_data <- dbGetQuery(conn, "SELECT * FROM gh_2007_2020.repos_data;")
+
+dbDisconnect(conn)
+
+```
+
+
