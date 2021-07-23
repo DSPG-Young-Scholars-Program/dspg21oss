@@ -1,0 +1,17 @@
+---
+title: "01_validated_repo"
+author: "Crystal"
+date: "7/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+oss_software_labelled_c_sz <- read_excel("git/dspg21oss/data/dspg21oss/labelled_repo/oss_software_labelled_c_sz.xlsx")
+View(oss_software_labelled_c_sz)
+```
+
