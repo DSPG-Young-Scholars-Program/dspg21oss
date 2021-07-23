@@ -3,9 +3,9 @@
 
 get_dictionary_terms <- function(summary_type, main_type, sub_type){
   
-  library("dplyr")
-  library("readr")
-  library("tidyr")
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
   
   if( missing(main_type) & missing(sub_type) ){ 
     
@@ -81,14 +81,12 @@ get_dictionary_terms <- function(summary_type, main_type, sub_type){
 
 detect_types <- function(df, id, input, terms){
   
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
   
   input <- enquo(input)
   output <- enquo(terms)
@@ -115,14 +113,12 @@ detect_types <- function(df, id, input, terms){
 
 detect_types <- function(df, id, input, terms){
   
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
   
   input <- enquo(input)
   output <- enquo(terms)
@@ -149,14 +145,12 @@ detect_types <- function(df, id, input, terms){
 
 detect_blockchain_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
   
   # load dictionaries for top-50 languages based on: 
   # https://madnight.github.io/githut/#/pull_requests/2021
@@ -202,14 +196,12 @@ detect_blockchain_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
 
 detect_database_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
   
   # load dictionaries for top-50 languages based on: 
   # https://madnight.github.io/githut/#/pull_requests/2021
@@ -257,14 +249,12 @@ detect_database_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
 
 detect_business_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
   
   # load dictionaries for top-50 languages based on: 
   # https://madnight.github.io/githut/#/pull_requests/2021
@@ -338,14 +328,12 @@ detect_business_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
 
 detect_prog_stat_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
   
   # load dictionaries for top-50 languages based on: 
   # https://madnight.github.io/githut/#/pull_requests/2021
@@ -402,14 +390,12 @@ detect_prog_stat_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
 
 detect_prog_web_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
   
   # load dictionaries for top-50 languages based on: 
   # https://madnight.github.io/githut/#/pull_requests/2021
@@ -486,14 +472,12 @@ detect_prog_web_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
 
 detect_prog_gen_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
-  library("dplyr")
-  library("readr")
-  library("tidyr")
-  library("readr")
-  library("stringr")
-  library("data.table")
-  library("tidytext")
-  library("tidytable")
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
   
   # load dictionaries for top-50 languages based on: 
   # https://madnight.github.io/githut/#/pull_requests/2021
@@ -574,7 +558,186 @@ detect_prog_gen_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
   
 }
 
+# system software 
 
+detect_system_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
+  
+  sys_general <- get_dictionary_terms(summary_type = "System", main_type = F, sub_type = F)
+  sys_os <- get_dictionary_terms(main_type = "Operating Systems")
+  sys_windows <- get_dictionary_terms(sub_type = "Windows")
+  sys_linux <- get_dictionary_terms(sub_type = "Linux")
+  sys_mac <- get_dictionary_terms(sub_type = "Mac")
+  sys_modern <- get_dictionary_terms(sub_type = "Modern")
+  sys_bsd <- get_dictionary_terms(sub_type = "BSD")
+  sys_android <- get_dictionary_terms(sub_type = "Android")
+  sys_solaris <- get_dictionary_terms(sub_type = "Solaris")
+  sys_virtual <- get_dictionary_terms(sub_type = "Virtualization")
+  sys_handheld <- get_dictionary_terms(sub_type = "Handheld/Embedded Operating Systems")
+  sys_emulapi <- get_dictionary_terms(sub_type = "Emulation and API Compatability")
+  sys_grouping <- get_dictionary_terms(sub_type = "Grouping and Descriptive Categories")
+  sys_other <- get_dictionary_terms(sub_type = "Other Operating Systems")
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, sys_general) %>% 
+    detect_types(!!id, !!input, sys_os) %>% 
+    detect_types(!!id, !!input, sys_windows) %>% 
+    detect_types(!!id, !!input, sys_linux) %>% 
+    detect_types(!!id, !!input, sys_mac) %>% 
+    detect_types(!!id, !!input, sys_modern) %>% 
+    detect_types(!!id, !!input, sys_bsd) %>% 
+    detect_types(!!id, !!input, sys_android) %>% 
+    detect_types(!!id, !!input, sys_solaris) %>% 
+    detect_types(!!id, !!input, sys_virtual) %>% 
+    detect_types(!!id, !!input, sys_handheld) %>% 
+    detect_types(!!id, !!input, sys_emulapi) %>% 
+    detect_types(!!id, !!input, sys_grouping) %>%
+    detect_types(!!id, !!input, sys_other) 
+  
+  df <- df %>% 
+    as.data.frame() %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(system_all = sum(across(contains("sys_")), na.rm = TRUE))
+  
+  if( sum_only == TRUE ){
+    
+    df <- df %>% select(-starts_with("sys_"))
+    
+  } else { df }
+  
+  if( prob == TRUE ){
+    
+    tmp_df <- readme_raw_data %>% 
+      as.data.frame() %>% 
+      tidytext::unnest_tokens(word, !!input) %>%
+      as_tidytable() %>% 
+      tidytable::count.(!!id, name = "n_words")
+    
+  } else { df }
+  
+  df
+  
+}
+
+## utility software 
+
+detect_utility_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
+  
+  util_general <- get_dictionary_terms(summary_type = "Utility", main_type = F, sub_type = F)
+  util_security <- get_dictionary_terms(main_type = "Security")
+  util_crypto <- get_dictionary_terms(sub_type = "Cryptography")
+  util_pwdmgr <- get_dictionary_terms(sub_type = "Password Manager")
+  util_malware <- get_dictionary_terms(sub_type = "Anti-Malware")
+  util_virus <- get_dictionary_terms(sub_type = "Anti-Virus")
+  util_spam <- get_dictionary_terms(sub_type = "Anti-Spam")
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, util_general) %>% 
+    detect_types(!!id, !!input, util_security) %>% 
+    detect_types(!!id, !!input, util_crypto) %>% 
+    detect_types(!!id, !!input, util_pwdmgr) %>% 
+    detect_types(!!id, !!input, util_malware) %>% 
+    detect_types(!!id, !!input, util_virus) %>% 
+    detect_types(!!id, !!input, util_spam) 
+  
+  df <- df %>% 
+    as.data.frame() %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(utility_all = sum(across(contains("util_")), na.rm = TRUE))
+  
+  if( sum_only == TRUE ){
+    
+    df <- df %>% select(-starts_with("util_"))
+    
+  } else { df }
+  
+  if( prob == TRUE ){
+    
+    tmp_df <- readme_raw_data %>% 
+      as.data.frame() %>% 
+      tidytext::unnest_tokens(word, !!input) %>%
+      as_tidytable() %>% 
+      tidytable::count.(!!id, name = "n_words")
+    
+  } else { df }
+  
+  df
+  
+}
+
+
+# ai/ml 
+
+detect_ai_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
+  
+  topics_ai <- get_dictionary_terms(sub_type = "Artificial Intelligence")
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, topics_ai)  
+  
+  df
+  
+}
+
+# data visualization 
+
+detect_viz_sw <- function(df, id, input, sum_only = FALSE, prob = FALSE){
+  
+  suppressMessages(library("dplyr"))
+  suppressMessages(library("readr"))
+  suppressMessages(library("tidyr"))
+  suppressMessages(library("stringr"))
+  suppressMessages(library("tidytext"))
+  suppressMessages(library("tidytable"))
+  
+  topics_dataviz <- get_dictionary_terms(sub_type = "Visualization")
+  
+  id <- enquo(id)
+  input <- enquo(input)
+  
+  df <- df %>% 
+    as_tidytable() %>% 
+    tidytable::mutate.("{{input}}" := tolower({{ input }})) %>% 
+    detect_types(!!id, !!input, topics_dataviz)  
+  
+  df
+  
+}
 
 
 
