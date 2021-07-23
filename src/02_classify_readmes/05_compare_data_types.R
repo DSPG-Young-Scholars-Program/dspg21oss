@@ -1,4 +1,7 @@
 
+# this was created by brandon to compare the data 
+# types but don't run this bc it will take days to run
+
 # create training sets 
 
 #### load the data and functions #####################################################################################
