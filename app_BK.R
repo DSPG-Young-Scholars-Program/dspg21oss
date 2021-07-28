@@ -1,18 +1,21 @@
-library(shiny)
-library(leaflet)
-library(tidyverse)
-library(ggthemes)
-library(RColorBrewer)
-library(sjmisc)
-library(shinythemes)
-library(DT)
-library(data.table)
-library(rsconnect)
-library(shinycssloaders)
-library(readxl)
-library(readr)
-library(stringr)
-library(shinyjs)
+if(!require(shiny)) install.packages("shiny", repos = "http://cran.us.r-project.org")
+if(!require(shinythemes)) install.packages("shinythemes", repos = "http://cran.us.r-project.org")
+if(!require(rsconnect)) install.packages("rsconnect", repos = "http://cran.us.r-project.org")
+if(!require(shinycssloaders)) install.packages("shinycssloaders", repos = "http://cran.us.r-project.org")
+if(!require(shinyjs)) install.packages("shinyjs", repos = "http://cran.us.r-project.org")
+if(!require(shinydashboard)) install.packages("shinydashboard", repos = "http://cran.us.r-project.org")
+
+if(!require(sjmisc)) install.packages("sjmisc", repos = "http://cran.us.r-project.org")
+if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
+if(!require(ggthemes)) install.packages("ggthemes", repos = "http://cran.us.r-project.org")
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(DT)) install.packages("DT", repos = "http://cran.us.r-project.org")
+if(!require(data.table)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+if(!require(readr)) install.packages("readr", repos = "http://cran.us.r-project.org")
+if(!require(stringr)) install.packages("stringr", repos = "http://cran.us.r-project.org")
+if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
+if(!require(collapsibleTree)) install.packages("collapsibleTree", repos = "http://cran.us.r-project.org")
+
 
 prettyblue <- "#232D4B"
 navBarBlue <- '#427EDC'
@@ -21,6 +24,16 @@ options(spinner.color = prettyblue, spinner.color.background = '#ffffff', spinne
 colors <- c("#232d4b","#2c4f6b","#0e879c","#60999a","#d1e0bf","#d9e12b","#e6ce3a","#e6a01d","#e57200","#fdfdfd")
 
 # data -----------------------------------------------------------
+
+# make tree ####
+df = read_csv("data_shiny/oss_software_types - dictionary.csv")
+df_no_na <- df %>% 
+  filter(!is.na(sourceforge_count)) %>% 
+  filter(!is.na(fleming_primary)) %>%
+  filter(!is.na(fleming_secondary)) %>%
+  mutate(main_type = replace(main_type, main_type=="" & summary_type!="Programming" & summary_type!="Other/Nonlisted Topic", "Other")) %>% 
+  mutate(sub_type = replace(sub_type, sub_type=="" & summary_type!="Programming" & summary_type!="Other/Nonlisted Topic", "Other"))
+
 
 # user -------------------------------------------------------------
 ui <- navbarPage(title = "OSS",
@@ -127,66 +140,93 @@ ui <- navbarPage(title = "OSS",
                                    p(tags$small(em('Last updated: July 2021'))))
                                    ),
                  
-                 # socio -----------------------------------------------------------
-                 tabPanel("Data & Methodology",
-                          value = "socio", #TODO: change
+                 # data -----------------------------------------------------------
+                 tabPanel("Data",
+                          value = "socio",
                           fluidRow(style = "margin: 6px;",
-                                 #  h1(strong("Patrick County Residents' Sociodemographic Characteristics"), align = "center"),
+                                   h1(strong("Data Source and Collection"), align = "center"),
                                    p("", style = "padding-top:10px;"),
                                    column(4,
                                           h4(strong("Data Source")),
-                                          h5(strong("Federal RePORTER")),
-                                          p("Our dataset consists of abstracts and project information for more than 1 million R&D grants entered into the Federal 
-                                            RePORTER system from 2008 - 2019. The Federal RePORTER database describes it as, 'a collaborative effort 
-                                            led by STAR METRICS® to create a searchable database of scientific awards from [federal] agencies. This
-                                            database promotes transparancy and engages the public, the research community, and agencies to describe 
-                                            federal science research investments and provide empirical data for science policy.' Project information 
-                                            includes project title, department, agency, principal investigator, organization, and project start date.
-                                            We downloaded our data using the Federal ExPORTER page.")
+                                          h5(strong("GitHub")),
+                                          p("Our data source is Github,which is the largest and most advanced development
+                                            platform in the world. People develop, store, 
+                                            and share programming packages as repositories on GitHub.")
                                          ),
                                    column(6,
-                                          h4(strong("Topic Modeling"))
-                                          #,
-                                          #withSpinner(leafletOutput("socioplot")),
-                                         # p(tags$small("Data Source: American Community Survey 2014/18 5-Year Estimates."))
+                                            h4(strong("Repository Descriptive Data")),
+                                          p("We first established the universe of OSS as any GitHub repository with one of 29
+                                            Open-Source Initiative (OSI)-approved licenses. Next, we developed an open source Julia package called GHOST.jl  
+                                            to scrape all the repos with these licenses, including the repository slug, license, description, primary language,
+                                              and date created for 10,288,063 distinct repositories (as of June 1, 2021). While this paper focuses on repository 
+                                              data, GHOST.jl also has the capacity to collect targeted user and activity data for all OSS repos on GitHub 
+                                        (Santiago-Calderon et al. 2021). "),
+                               
+                                            
+                                          h4(strong("Repository Popularity Statistics and READMEs")),
+                                          p("To supplement these repository descriptive data, we also developed two Python scripts to scrape repository popularity 
+statistics and READMEs from the top 250,000 repos ranked by the number of commits. The collection of
+                                            repository popularity statistics (stars, watchers, forks, and topics) was aided by the use of the pyGitHub (Jacques 2021). 
+                                            On the other hand, we used the requests and BeautifulSoup modules to scrape the raw text of READMEs from these repositories 
+                                            (Reitz 2020; Richardson 2007).  ")
                                    ))
                                    ),
                  
-                 # -----------------------------------------------------------
+                 # software type, Cierra-----------------------------------------------------------
                  tabPanel("Software Types", value = "data",
+                          h1(strong("Software Types"), align = "center"),
                           fluidRow(style = "margin: 6px;",
-                                   h1(strong("Software Types"), align = "center"),
-                                   br()
+                                   column(6,
+                                          h4(strong("Classification")),
+                                          p("The main objective of our project is to classify GitHub repositories
+                                            into software types so that the NCSES and other federal statisticians 
+                                            can better understand the economic evaluation of labor costs and 
+                                            software impact. To classify GitHub projects into software types, we 
+                                            drew from two primary schemas integrating them into general “summary 
+                                            types” and more nuanced “main types” and “sub types.” The summary types 
+                                            include Application Software, Programming Software, System Software, 
+                                            Utility Software, and General Topics (Fleming YEAR), which are meant 
+                                            to inform broader understandings of economic evaluation for federal 
+                                            statisticians. The more nuanced main and sub types, on the other hand, 
+                                            derive from categorizations provided by another prominent open source 
+                                            code hosting platform named SourceForge (https://sourceforge.net/).
+                                            While GitHub repos do, at times, have topics listed, the site 
+                                            does not organize projects by topics. SourceForge’s more 
+                                            sophisticated and wide-ranging classification schema allowed us 
+                                            to focus on smaller subcategories that could be aggregated into 
+                                            the broader summary types later on. Below, we used R’s collapsibleTree
+                                            package to visualize how these three levels of categorization fit together.")
+                                   ),
+                                   column(6, 
+                                          h4(strong("Collapsible tree")),
+                                          plotOutput("collapsible_tree")
+                                   )
+                          )
                           ),
-                          tabsetPanel(
-                            tabPanel("Method",
-                                     h3("", align = "center"),
-                                     br("")),
-                            tabPanel("Results",  
-                                     h3(strong(""), align = "center")
-                            )
-                                            )
-                                            ),
+                                            
                  
                  
-                 # -----------------------------------------------------------
+                 # Classification Method-----------------------------------------------------------
                  tabPanel("Classification Methods", value = "data",
                           fluidRow(style = "margin: 6px;",
                                    h1(strong("Classification Methods"), align = "center"),
                                    br()
                           ),
                           tabsetPanel(
-                            tabPanel("Method",
+                            tabPanel("Supervised Text Mining",
                                      h3("", align = "center"),
                                      br("")),
-                            tabPanel("Results",  
+                            tabPanel("Sentence Embeddings Estimation",  
+                                     h3(strong(""), align = "center")
+                            ),
+                            tabPanel("Network Embeddings",  
                                      h3(strong(""), align = "center")
                             )
                           )
                  ),
                  # contact -----------------------------------------------------------
                  tabPanel("Contact", value = "contact",
-                          fluidRow(style = "margin-left: 300px; margin-right: 300px;",
+                          fluidRow(style = "margin-left: 100px; margin-right: 100px;",
                                    h1(strong("Contact"), align = "center"),
                                    br(),
                                    h4(strong("UVA Data Science for the Public Good")),
@@ -198,7 +238,7 @@ ui <- navbarPage(title = "OSS",
                                      highlights, how to apply, and our annual symposium, please visit", a(href = 'https://biocomplexity.virginia.edu/social-decision-analytics/dspg-program', 'the official Biocomplexity DSPG website.', target = "_blank")),
                                    p("", style = "padding-top:10px;")
                                    ),
-                          fluidRow(style = "margin-left: 300px; margin-right: 300px;",
+                          fluidRow(style = "margin-left: 20px; margin-right: 20px;",
                                    column(6, align = "center",
                                           h4(strong("DSPG Team Members")),
                                           img(src = "Crystal.jpeg", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
@@ -206,7 +246,7 @@ ui <- navbarPage(title = "OSS",
                                           img(src = "Stephanie.png", style = "display: inline; border: 1px solid #C0C0C0;", width = "150px"),
                                           p(a(href = 'https://www.linkedin.com/in/crystal-zang', 'Crystal Zang', target = '_blank'), "(University of Pittsburgh Graduate School of Public Health, Biostatistics);",
                                             a(href = '', 'Cierra Oliveira', target = '_blank'), "(Clemson University, Computing and Applied Sciences);",
-                                            a(href = '', 'Stephanie Zheng', target = '_blank'), "(University of Virginia, Mathematics (Probability/Statistics), Sociology);"),
+                                            a(href = '', 'Stephanie Zhang', target = '_blank'), "(University of Virginia, Mathematics (Probability/Statistics), Sociology);"),
                                           p("", style = "padding-top:10px;")
                                    ),
                                    column(6, align = "center",
@@ -218,7 +258,7 @@ ui <- navbarPage(title = "OSS",
                                           p("", style = "padding-top:10px;")
                                    )
                           ),
-                          fluidRow(style = "margin-left: 300px; margin-right: 300px;",
+                          fluidRow(style = "margin-left: 100px; margin-right: 100px;",
                                    h4(strong("Project Stakeholders")),
                                    p(a(href = '', 'Carol Robbins' , target = '_blank'), "(NCSES);"),
                                    p(a(href = '', 'Ledia Guci', target = '_blank'), "(NCSES);"),
@@ -236,7 +276,17 @@ server <- function(input, output, session) {
   # Run JavaScript Code
   #runjs(jscode)
   
-  # socio plots: done -----------------------------------------------------
+  # collapsible tree -----------------------------------------------------
+  output$collapsible_tree <- renderPlot({
+      collapsibleTreeSummary(df_no_na,
+      hierarchy = c("summary_type", "main_type", "sub_type"),
+      width=800, height = 1000,  
+      root = "Software Types", 
+      fontSize = 20,
+      zoomable = FALSE,
+      attribute = "sourceforge_count",
+      fillFun = colorspace::heat_hcl)
+  })
   
   var <- reactive({
     input$sociodrop

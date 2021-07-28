@@ -1,0 +1,123 @@
+---
+title: "04_embedding"
+author: "Crystal"
+date: "7/27/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(mosaic)
+```
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+setwd("/home/zz3hs/git/dspg21oss/data/dspg21oss/")
+embeddings <- read_csv("repo_embedding_3d_pca.csv")
+
+label <- read_csv("oss_software_labelled.csv")
+
+```
+
+# Clean label
+```{r}
+colnames(label)
+
+ls = c("prog_java", "prog_php", "prog_python", "prog_javascript", "prog_clang", "app_blockchain_all", "app_database_all", "topics_ai", "topics_dataviz")
+
+ls_corpus = c("ai_label", "blockchain_label","clang_label","database_label","dataviz_label","java_label","javascript_label","php_label","python_label")
+
+label_true = label%>%
+  gather("software_type", "is_type",-slug)%>%
+  filter(software_type %in% ls)%>%
+  mutate(IS_TYPE = ifelse(is.na(is_type), F, T))%>%
+  filter(IS_TYPE==T)
+
+table(label_true$software_type)
+
+label_corpus = label%>%
+  gather("software_type", "is_type",-slug)%>%
+  filter(software_type %in% ls_corpus)%>%
+  mutate(IS_TYPE_CORPUS = ifelse(is_type==1, T, F))%>%
+  filter(IS_TYPE_CORPUS==T)%>%
+  select(-is_type)
+table(label_corpus$software_type)
+
+```
+
+# Clean embedding scores
+```{r}
+#embedding_score <- read_csv("data/dspg21oss/full_repo_sim_scores_co.csv")
+```
+
+#Embeddings
+```{r}
+embeddings_label = left_join(embeddings, label_true, by = "slug")
+embeddings_label = embeddings_label%>%
+  filter(!is.na(software_type))
+
+library(ggforce)
+ggplot(embeddings_label, aes(x = x, y = y)) + geom_point()  + aes(colour = software_type) + theme(legend.position = "right") + labs(title = "First two principal components")+
+  geom_mark_circle(aes(color = software_type))
+
+ggplot(embeddings_label, aes(x = y, y = z)) + geom_point()  + aes(colour = software_type) + theme(legend.position = "right") + labs(title =  "Second and third principal components")+
+  geom_mark_circle(aes(color = software_type))
+```
+
+#Embeddings_corpus
+```{r}
+table(label_corpus$software_type)
+
+embeddings_label = left_join(embeddings, label_corpus, by = "slug")
+embeddings_label = embeddings_label%>%
+  filter(!is.na(software_type))
+
+library(ggforce)
+ggplot(filter(embeddings_label, software_type %in% c("ai_label", "database_label","dataviz_label")), 
+       aes(x = x, y = y)) + 
+  geom_point()  + 
+  aes(colour = software_type) + 
+  theme(legend.position = "right") + 
+  labs(title = "First two principal components")+
+  geom_mark_circle(aes(color = software_type))
+
+ggplot(filter(embeddings_label, software_type %in% c("ai_label", "database_label","dataviz_label")) , 
+       aes(x = y, y = z)) + geom_point()  + aes(colour = software_type) + theme(legend.position = "right") + labs(title =  "Second and third principal components")+
+  geom_mark_circle(aes(color = software_type))
+```
+
+## 3d plot using rgl
+```{r}
+library(akima)
+
+library(rgl)
+x = embeddings_label$x
+y = embeddings_label$y
+z = embeddings_label$z
+s = interp(x,y,z, duplicate =F)
+
+#surface3d(s$x,s$y,s$z)
+```
+
+## 3d plot using scatterplot3d
+```{r}
+library("scatterplot3d") 
+table(embeddings_label$software_type)
+
+colors_rgb <- c("#232d4b","#2c4f6b","#0e879c",
+            "#60999a","#d1e0bf","#d9e12b",
+            "#e6ce3a","#e6a01d","#e57200")
+colors <- colors_rgb[as.numeric(embeddings_label$software_type)]
+
+
+scatterplot3d(x=embeddings_label$x, y=embeddings_label$y, z=embeddings_label$z, color = colors)
+```
+
