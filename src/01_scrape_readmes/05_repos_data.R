@@ -33,7 +33,7 @@ repos_table_349 <- dbGetQuery(conn, "SELECT slug, description, primarylanguage a
 dbDisconnect(conn)
 
 # repo_stats data 
-setwd(path_for_data)
+setwd("/project/class/bii_sdad_dspg/uva_2021/dspg21oss/")
 repo_stats <- read_csv("repo_stats_0714.csv")
 
 readme_404_removed <- readme_raw_data %>% 
@@ -71,8 +71,9 @@ conn <- dbConnect(drv = PostgreSQL(),
                   port = 5432,
                   user = Sys.getenv("db_userid"),
                   password = Sys.getenv("db_pwd"))
-dbWriteTable(conn, c("gh_2007_2020", "repos_subset_157k"), combined_alt, row.names = FALSE)
-dbWriteTable(conn, c("gh_2007_2020", "repos_subset_358k"), combined, row.names = FALSE)
+dbWriteTable(conn, c("gh_2007_2020", "repos_subset_final"), combined_alt, row.names = FALSE)
+#dbWriteTable(conn, c("gh_2007_2020", "repos_subset_157k"), combined_alt, row.names = FALSE)
+#dbWriteTable(conn, c("gh_2007_2020", "repos_subset_358k"), combined, row.names = FALSE)
 dbDisconnect(conn)
 
 setwd("/project/class/bii_sdad_dspg/uva_2021/dspg21oss/")
