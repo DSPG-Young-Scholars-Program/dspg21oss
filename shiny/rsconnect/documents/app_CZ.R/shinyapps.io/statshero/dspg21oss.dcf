@@ -1,0 +1,12 @@
+name: dspg21oss
+title: dspg21oss
+username:
+account: statshero
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4433327
+bundleId: 4865270
+url: https://statshero.shinyapps.io/dspg21oss/
+when: 1627492285.61149
+asMultiple: FALSE
+asStatic: FALSE
