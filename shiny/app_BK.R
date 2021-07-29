@@ -80,60 +80,49 @@ ui <- navbarPage(title = "OSS",
                           ),
                           fluidRow(style = "margin: 6px;",
                                    column(4,
-                                          h2(strong("Project Background")),
-                                          p(strong("The problem."), "Rural counties often face challenges in providing health care access to their residents given limited", a(href = "https://www.ruralhealthinfo.org/topics/hospitals", "health facilities", target = "_blank"), 
-                                            "available, lack of broadband infrastructure that makes it difficult to provide", a(href = "https://www.ruralhealthinfo.org/topics/telehealth", "telemedicine access", target = "_blank"), "or communicate health information, and individual-level", 
-                                            a(href = "https://www.ruralhealthinfo.org/topics/social-determinants-of-health", "inequalities", target = "_blank"), "that pose barriers to health care use and health 
-                                            behaviors. Identifying areas of high need or potential solutions may also be difficult for rural areas without adequate resources to acquire, analyze, and interpret 
-                                            relevant data."),
-                                          p(),
-                                          p(strong("The setting."), a(href = "https://www.co.patrick.va.us/", "Patrick County", target = "_blank"), "is a rural area in Virginia’s Central Piedmont, bordering North Carolina, 
-                                            with a declining population of approximately 17,600 people. Like many other rural areas in the United States, Patrick County is having difficulty meeting its residents’ health and quality of life needs. 
-                                            The county’s", a(href = "https://www.countyhealthrankings.org/app/virginia/2019/rankings/patrick/county/outcomes/overall/snapshot", "doctor to patient ratios", target = "_blank"), 
-                                            "of 3,530 to 1 for primary care providers, 8,840 to 1 for dentists, and 2,520 to 1 for mental health providers are 3- 
-                                            to 8-times higher than statewide, and the county’s only hospital closed in 2017. At the same time, the median income for Patrick County residents is $42,900, 
-                                            46% of children living in the county are eligible for free or reduced-price school lunch, and 12% of residents are food insecure."),
-                                          p(),
-                                          p(strong("The project."), "This University of Virginia", a(href = "https://biocomplexity.virginia.edu/social-decision-analytics", "Biocomplexity Institute", target = "_blank"), 
-                                            "Data Science for Public Good (DSPG) project aimed to build local capacity, leverage social and data science to address current and future resident well-being, and enhance 
-                                            data-driven decision making about rural health in Patrick County, Virginia.")
+                                          h2(strong("Big Picture")),
+                                          p("Since the advent of the internet, software has become integral part of our 
+                                            lived social realities. From the rise of mobile phones to social media apps, software 
+                                            shapes how we interact with those around us as well as driving much of the econonic growth seen around the world. 
+                                            Federal economic indicators developed by the National Center for Science & Engineering Statistics (NCSES) 
+                                            do not currently do well in measuring the value of goods and services that do not have market transactions 
+                                            (i.e., they are not captured in surveys nor are they in economic measures such as the Gross Domestic Product or GDP). 
+                                            Although the NCSES does track some types of software development, 
+                                            it is challenging to account for software that is developed outside of traditional business contexts. Moreover, while 
+                                            current measures of innovation tend to rely on survey data, patent issues, trademarks approvals, intangible asset data, 
+                                            or estimates of total factor productivity growth, these measures are either incomplete or 
+                                            fail to capture innovation that is freely available to the public.")
                                           ),
                                    column(4,
-                                          h2(strong("Our Work")),
-                                          p("Our research team worked closely with Patrick County Extension Office, Virginia Department of Health, and Healthy Patrick County coalition stakeholders 
-                                            to identify the county’s priority challenges in the area of health. The research team reviewed a prior", a(href = "https://www.vdh.virginia.gov/west-piedmont/2020/05/27/patrick-county-health-needs-improvement-plan-completed/", 
-                                                                                                                                                       "community health assessment,", target = "blank"), a(href = "https://www.pubs.ext.vt.edu/VCE/VCE-596/VCE-596-75/VCE-1002-75.html", "situation analysis", target = "_blank"),
-                                            "relevant funding applications, and held a listening meeting with stakeholders to identify these challenges. Lack of 
-                                            data on health care access, food access as related to diabetes and heart disease prevalence, older adult health, and digital connectivity that would facilitate 
-                                            access to telemedicine emerged as key problems where providing actionable insights could address barriers to Patrick County residents’ health."),
-                                          p(),
-                                          p("We implemented the", a(href = "https://doi.org/10.1162/99608f92.2d83f7f5", "data science framework", target = "_blank"), "and identified, acquired, profiled, and used 
-                                            publicly available data to provide Patrick County with data-driven resources in each of the four priority areas. We:"),
-                                          tags$li("Provided census tract- and census block group-level maps of Patrick County residents'", strong("sociodemographic and socioeconomic characteristics,"), " highlighting underprivileged areas."),
-                                          tags$li("Created census tract-level maps on", strong("older adult health"), "to show the geographic distribution of older adults in the county by gender and
-                                                  type of disability, identifying areas where providing telehealth or travelling preventive care services may be particularly important."),
-                                          tags$li("Mapped residents'", strong("computing device and internet access"), "at census block group level, and constructed 10- and 15-minute isochrones (areas of equal travel time) from households to free
-                                                  wifi hotspots to highlight internet gaps that could suggest where new wi-fi hotspots could be optimally placed to provide internet access to more residents."),
-                                          tags$li("Calculated and mapped", strong("emergency medical service (EMS) station coverage"), "of households within 8-, 10-, and 12-minute travel times, identifying areas difficult to reach within 
-                                                  standard EMS travel thresholds."),
-                                          tags$li("Constructed", strong("food access"), "maps by census tract, 10- and 15-minute isochrones from households to grocery stores and farmers markets, and maps of food security resources in the county,
-                                                  highlighting food deserts and areas that could benefit from programs facilitating access to fresh produce."),
-                                          p(),
-                                          p("This dashboard compiles our findings and allows extension professionals, stakeholders, and other users to explore the information interactively.")
-                                          ),
+                                          h2(strong("Project Overview")),
+                                          p("To address this gap, the NCSES is interested in evaluating the economic and social impact of 
+                                            Open Source Software (OSS) through the use of public administrative data. OSS refers to computer software with
+                                            its source code shared with a license in which the copyright holder provides the rights to study,
+                                            change, or distribute the software to anyone and for any purpose. Over the past few years, our team has aimed 
+                                            to measure how much OSS is in use (stock), how much is created (flow), who is developing these tools (based on sectors, institutions, 
+                                            and organizations) as well as how OSS is shared across these various institutions. In past Data Science for the Public Good projects, we developed procedures to 
+                                            classify users into sectors, but very little work to date examines how different types of software are used within and across these sectors. 
+                                            In this year’s OSS DSPG project, we will be collecting data from GitHub OSS repositories, classifying these repos into different OSS types, 
+                                            and evaluating how these different types of software are used within and across economic sectors. 
+                                            Developing a procedure to classify repositories into categories will allow the NCSES to better determine the effect that variations in software 
+                                            may have on OSS contribution activity, collaboration tendencies in networked ecosystems, or on the overall cost of OSS projects.")
+                                    ),
                                    column(4,
-                                          h2(strong("Dashboard Aims")),
-                                          p("Our dashboard is aimed at:"),
-                                          p(strong("Patrick County extension professionals and the communities they serve."), "Information available through the interface helps extension 
-                                            agents identify areas where residents may not have access to internet, or areas with a high smartphone ownership share, suggesting what channels agents may 
-                                            want to use to disseminate health-related information most effectively. Information on older adult populations and grocery store access can help extension agents 
-                                            better understand where underserved populations live and how to advocate on their behalf."),
-                                          p(strong("Local health-related agencies and departments seeking data insights to inform their decision-making."), "For local stakeholders, identifying broadband 
-                                            access gaps that limit access to telemedicine, grocery store access gaps, and areas with high proportions of older adults with independent living difficulty can suggest 
-                                            optimal locations for placing free wifi hotspots, providing grocery delivery services, devising mobile health unit routes, or can inform other solutions that would benefit 
-                                            a broad population base."),
-                                          p(strong("State government representatives in the Virginia Department of Health and the State Office of Rural Health."), "These and similar stakeholders may 
-                                            need small or rural area-specific insights that Centers for Disease Control and other county-level datasets cannot provide.")
+                                          h2(strong("Our Approach")),
+                                          p("In this project, we study GitHub - the world's largest code hosting repository platform. The platform has roughly 40 million 
+                                            users and 190 million repositories - many of which we have scraped using our own open source tools. Our dataset includes descriptive statistics on 
+                                            10.2 million repositories as well as more detailed text data (READMEs) on around 157,000 projects (see Data)."), 
+                                          tags$li("To classify GitHub projects into software types, we developed term-matching algorithms to allocate repos into various categories. This typology was borrowed from the Bureau of Economic Analysis and 
+                                            Martin Fleming's (2021) proposed software categories that are generally useful for economists as well as more nuanced software categories. 
+                                            that we extracted from ", a(href = "https://sourceforge.net/", "SourceForge", target = "_blank"),", which are designed by and more arguably more useful for computer programmers to organize existing projects (see Software Types). 
+                                            For the 2021 DSPG summer project, we focused on 10 prominent OSS categories "), 
+                                          tags$li("Third, we worked to validate that our approach generated accurate results by comparing manually validated repos to untagged repos through the use of Bidirectional Encodings 
+                                            through Representational Transformers (or ", a(href = "https://huggingface.co/transformers/model_doc/bert.html", "BERT", target = "_blank"),"). Generally, this approach allows us to embed sentences' meanings within a vector space to compare how similar 
+                                            the content is using a cosine similarity metric."), 
+                                          tags$li("Finally, we used node embeddings (or ", a(href = "https://snap.stanford.edu/node2vec/", "node2vec", target = "_blank"),") to compare the similarity of repository collaboration 
+                                            networks based on common contributors. Like word embeddings, node embeddings place repos as vectors within a vector space with those that are 
+                                            most similar closest to one another. By combing these strategies, we hope to infer software types based on their collaboration networks and improve our abilities to 
+                                            classify GitHub repositories through a combination of these computational methods.")
                                           )
                                           ),
                           fluidRow(align = "center",
@@ -148,27 +137,67 @@ ui <- navbarPage(title = "OSS",
                                    p("", style = "padding-top:10px;"),
                                    column(4,
                                           h4(strong("Data Source")),
-                                          h5(strong("GitHub")),
-                                          p("Our data source is Github,which is the largest and most advanced development
-                                            platform in the world. People develop, store, 
-                                            and share programming packages as repositories on GitHub.")
+                                          #h5(strong("GitHub")),
+                                          p("Our data comes from", a(href = "https://www.github.com/", "GitHub", target = "_blank"),  
+                                            "- the world's largest code hosting repository platform in the world. People develop, store, 
+                                            and share programming projects as repositories on GitHub. As of January 2020, GitHub had more 
+                                            than 40 million users and 190 million repositories - 28 million of which are in the public domain. 
+                                            Other prominent code hosting platforms include GitLab (32M users), BitBucket (5M users), LaunchPad (4M users),
+                                            and SourceForge (3.7M users). While other research projects, such as GHTorrent, GitHub Archive, and Software Heritage 
+                                            have aimed to collect code development activity more broadly, we are interested in examining a subset of GitHub repositories 
+                                            with licenses that explicitly designate them as open source. OSS licenses allow software to be freely used, modified, and shared, 
+                                            providing value for that software to be replicated and repurposed for a wide variety of purposes.")
                                          ),
                                    column(6,
+                                          
+                                          h4(strong("Overaching Methodology")),
+                                          p("To classify and examine GitHub repositories, we aimed to first collect a survey of all OSS repositories on GitHub in addition to 
+                                            summaries of their commit activities and descriptive information such as repo descriptions and READMEs (see below). We then 
+                                            developed algorithms that classified the repos into software types. This typology was borrowed from the Bureau of Economic Analysis and 
+                                            Martin Fleming's (2021) proposed software categories that are generally useful for economists as well as more nuanced software categories 
+                                            that we extracted from ", a(href = "https://sourceforge.net/", "SourceForge", target = "_blank"),", which are designed by and more arguably more useful for computer programmers to organize existing projects. Our initial classification effort was 
+                                            predicated on a term-matching approach where we curated a nested dictionary with terms like 'tensorflow' or 'pytorch' mapping onto broader 
+                                            cateogores like 'artificial intelligence/machine learning' and then aggregating up to 'software developmental tools' in our summary categories (see Software Types page 
+                                            for more detils). For the 2021 DSPG summer project, we limited our curation of terms to 10 categories and then sought to validate 
+                                            that our approach generated accurate results by comparing manually validated repos to untagged repos through the use of Bidirectional Encodings 
+                                            through Representational Transformers (or ", a(href = "https://huggingface.co/transformers/model_doc/bert.html", "BERT", target = "_blank"),"). Generally, this approach allows us to embed sentences' meanings within a vector space to compare how similar 
+                                            the content is using a cosine similarity metric. Similarly, we also decided to use node embeddings (or ", a(href = "https://snap.stanford.edu/node2vec/", "node2vec", target = "_blank"),") to compare the similarity of repository collaboration 
+                                            networks based on common contributors. Like word embeddings, node embeddings place repos as vectors within a vector space with those that are 
+                                            most similar closest to one another. By combing these strategies, we hope to infer software types based on their collaboration networks and improve our abilities to 
+                                            classify GitHub repositories."),
+                                          
                                             h4(strong("Repository Descriptive Data")),
-                                          p("We first established the universe of OSS as any GitHub repository with one of 29
-                                            Open-Source Initiative (OSI)-approved licenses. Next, we developed an open source Julia package called GHOST.jl  
-                                            to scrape all the repos with these licenses, including the repository slug, license, description, primary language,
-                                              and date created for 10,288,063 distinct repositories (as of June 1, 2021). While this paper focuses on repository 
-                                              data, GHOST.jl also has the capacity to collect targeted user and activity data for all OSS repos on GitHub 
-                                        (Santiago-Calderon et al. 2021). "),
+                                          p("To establish our universe of OSS, we used a list of 29 Open-Source Initiative (OSI)-approved licenses 
+                                              derived from the Ruby Gem Licensee on GitHub. Next, we developed an open source Julia package called", a(href = "https://uva-bi-sdad.github.io/GHOST.jl/dev/", "GHOST.jl", target = "_blank"), 
+                                            "to scrape all the repos with these licenses, including the repository slug, license, description, primary language,
+                                              and date created for 10,288,063 distinct repositories. Though this paper focuses on repository data, 
+                                            GHOST.jl also has the capacity to collect targeted user and activity data for all OSS repos on GitHub, 
+                                            which we hope to continue to collecting to monitor the impact of open source in the 
+                                            years to come. For this project, our main goal was to use the repository slug (owner/repo name), descriptions and 
+                                            commit histories to learn more about the types of software being developed on GitHub's platform by classifying the projects 
+                                            through the use of term-matching, sentence embeddings (i.e. BERT), and node embeddings (i.e. node2vec)."),
                                
                                             
-                                          h4(strong("Repository Popularity Statistics and READMEs")),
-                                          p("To supplement these repository descriptive data, we also developed two Python scripts to scrape repository popularity 
-statistics and READMEs from the top 250,000 repos ranked by the number of commits. The collection of
-                                            repository popularity statistics (stars, watchers, forks, and topics) was aided by the use of the pyGitHub (Jacques 2021). 
-                                            On the other hand, we used the requests and BeautifulSoup modules to scrape the raw text of READMEs from these repositories 
-                                            (Reitz 2020; Richardson 2007).  ")
+                                          h4(strong("Repository Popularity and READMEs Data")),
+                                          p("To supplement these repository descriptive data, we also developed two Python scripts to scrape repository ", 
+                                            a(href = "https://github.com/DSPG-Young-Scholars-Program/dspg21oss/blob/main/src/01_scrape_readmes/03_scrape_repo_stats.ipynb", "popularity statistics", target = "_blank"),
+                                            " and ", a(href = "https://github.com/DSPG-Young-Scholars-Program/dspg21oss/blob/main/src/01_scrape_readmes/02_scrape_readmes_requests_final.ipynb", "READMEs", target = "_blank"), 
+                                            " for the top 250,000 repos ranked by the number of commits. The collection of
+                                            repository popularity statistics (stars, watchers, forks, and topics) was aided by the use of the", a(href = "https://pygithub.readthedocs.io/en/latest/introduction.html", "pyGithub.", target = "_blank"),
+                                            "These data tell us more about high-impact projects and allow us to compare them with those that have the most commit activity.
+                                            To collect repository READMEs, we used Python's", a(href = "https://docs.python-requests.org/en/master/", "requests", target = "_blank"), 
+                                            " and ", a(href = "https://www.crummy.com/software/BeautifulSoup/bs4/doc/", "Beautiful Soup", target = "_blank"), " modules to scrape the raw text of READMEs from 
+                                            these repositories before joining these data sources together. Once we merged these data,
+                                            our sample shrunk to 157,538 entries that had valid description and README entries. These data, in turn, were used to 
+                                            classify software types using our term-matching and sentence embeddings."),
+                                          
+                                          h4(strong("Repository Network Data")),
+                                          p("Finally, we decided to use a form of graph representational learning called node embeddings (specifically node2vec) to
+                                            examine the similarity of projects based on their collaboration networks. Drawing from the commit activity data scraped 
+                                            using the GHOST.jl package, we constructed a repository collaboration network where the nodes represent repositories and 
+                                            the edges correspond to the number of common collaborators between those repos. Given the size of the full network and the 
+                                            computational limitations it presents for conducting node embedding, these collaboration networks were limited to the 
+                                            repositories in the 157K subset mentioned above. After isolate nodes were removed, this network ended up being comprised of 416 nodes and 5,237 edges.")
                                    ))
                                    ),
                  
@@ -259,12 +288,13 @@ statistics and READMEs from the top 250,000 repos ranked by the number of commit
                                    )
                           ),
                           fluidRow(style = "margin-left: 100px; margin-right: 100px;",
-                                   h4(strong("Project Stakeholders")),
-                                   p(a(href = '', 'Carol Robbins' , target = '_blank'), "(NCSES);"),
-                                   p(a(href = '', 'Ledia Guci', target = '_blank'), "(NCSES);"),
+                                   h4(strong("Project Sponsors")),
+                                   p(a(href = '', 'Carol Robbins' , target = '_blank'), "(NCSES, Senior Analyst);"), 
+                                   p(a(href = '', 'Ledia Guci', target = '_blank'), "(NCSES, Science Resource Analyst);"), 
                                    p("", style = "padding-top:10px;"),
                                    h4(strong("Acknowledgments")),
-                                   p("We would like to thank xxxxxxx for their input to this project.")
+                                   p("In addition to our appreciation to Carol Robbins, Ledia Guci, and Bayoán Santiago Calderón for their continued support 
+                                     of work on OSS, we also want to thank Martin Fleming for joining us to talk about software classification.")
                           )
                           ),
                  inverse = T)
