@@ -214,13 +214,21 @@ statistics and READMEs from the top 250,000 repos ranked by the number of commit
                           ),
                           tabsetPanel(
                             tabPanel("Supervised Text Mining",
-                                     h3("", align = "center"),
-                                     br("")),
+                                     h3("Supervised Text Mining", align = "center"),
+                                     br(""),
+                                     p("To classify the repositories scraped from GitHub, a nested dictonary approach was adopted following the classificaiton of software types. To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
+                                       Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
+                                       The figure below shows the results of this initial classification based on keyword."),
+                                     img(src='classificationBreakdown.png')),
                             tabPanel("Sentence Embeddings Estimation",  
                                      h3(strong(""), align = "center")
                             ),
-                            tabPanel("Network Embeddings",  
-                                     h3(strong(""), align = "center")
+                            tabPanel("Node2Vec Embeddings",  
+                                     h3(strong("Node2Vec Embeddings"), align = "center"), 
+                                     br(),
+                                     p("Based on a network of repositories (nodes) and collaberators (edges), the Node2Vec algorithm was used to generate embeddings.
+                                       As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on similarity in collaberators. To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions. As seen below
+                                       [image], repositories with the same language are clustered together [generate image again + add centrality/page rank info?]")
                             )
                           )
                  ),
