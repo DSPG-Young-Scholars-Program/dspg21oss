@@ -228,7 +228,8 @@ statistics and READMEs from the top 250,000 repos ranked by the number of commit
                                      br(),
                                      p("Based on a network of repositories (nodes) and collaberators (edges), the Node2Vec algorithm was used to generate embeddings.
                                        As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on similarity in collaberators. To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions. As seen below
-                                       [image], repositories with the same language are clustered together [generate image again + add centrality/page rank info?]")
+                                       , repositories with the same language (indicated by color) are clustered together. The size of the node reflects degree centrality, which indicates how \"connected\" a node is."),
+                                     img(src='node2vec', align="center")
                             )
                           )
                  ),
