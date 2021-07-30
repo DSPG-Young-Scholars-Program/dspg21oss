@@ -176,30 +176,39 @@ statistics and READMEs from the top 250,000 repos ranked by the number of commit
                  tabPanel("Software Types", value = "data",
                           h1(strong("Software Types"), align = "center"),
                           fluidRow(style = "margin: 6px;",
-                                   column(6,
+                                   column(4,
                                           h4(strong("Classification")),
                                           p("The main objective of our project is to classify GitHub repositories
                                             into software types so that the NCSES and other federal statisticians 
                                             can better understand the economic evaluation of labor costs and 
                                             software impact. To classify GitHub projects into software types, we 
                                             drew from two primary schemas integrating them into general “summary 
-                                            types” and more nuanced “main types” and “sub types.” The summary types 
+                                            types” and more nuanced “main types” and “sub types.”"),
+                                          p("The summary types 
                                             include Application Software, Programming Software, System Software, 
-                                            Utility Software, and General Topics (Fleming YEAR), which are meant 
+                                            Utility Software, and General Topics (Fleming 2021), which are meant 
                                             to inform broader understandings of economic evaluation for federal 
                                             statisticians. The more nuanced main and sub types, on the other hand, 
                                             derive from categorizations provided by another prominent open source 
-                                            code hosting platform named SourceForge (https://sourceforge.net/).
-                                            While GitHub repos do, at times, have topics listed, the site 
+                                            code hosting platform named", 
+                                            a(href = "https://sourceforge.net/", " SourceForge. ", target = "_blank"),
+                                            "While GitHub repos do, at times, have topics listed, the site 
                                             does not organize projects by topics. SourceForge’s more 
                                             sophisticated and wide-ranging classification schema allowed us 
                                             to focus on smaller subcategories that could be aggregated into 
-                                            the broader summary types later on. Below, we used R’s collapsibleTree
+                                            the broader summary types later on."), 
+                                          p("Using both schemas offers insight to 
+                                            economists interested in evaluating the costs of broader, more general categories 
+                                            as well as researchers interested in specialized, more specific categories. 
+                                            Below, we used R’s collapsibleTree
                                             package to visualize how these three levels of categorization fit together.")
                                    ),
-                                   column(6, 
-                                          h4(strong("Collapsible tree")),
-                                          plotOutput("collapsible_tree")
+                                   column(8, 
+                                          h4(strong("Collapsible Trees")),
+                                          h6(strong("Fleming Classification Schema")),
+                                          collapsibleTreeOutput("tree_flemming"),
+                                          h6(strong("Source Forge Classification Schema")),
+                                          collapsibleTreeOutput("tree_sf")
                                    )
                           )
                           ),
@@ -277,16 +286,38 @@ server <- function(input, output, session) {
   #runjs(jscode)
   
   # collapsible tree -----------------------------------------------------
-  output$collapsible_tree <- renderPlot({
-      collapsibleTreeSummary(df_no_na,
-      hierarchy = c("summary_type", "main_type", "sub_type"),
-      width=800, height = 1000,  
-      root = "Software Types", 
-      fontSize = 20,
-      zoomable = FALSE,
-      attribute = "sourceforge_count",
-      fillFun = colorspace::heat_hcl)
+  output$tree_flemming <- renderCollapsibleTree({
+    collapsibleTreeSummary(df,
+                           hierarchy = c("fleming_primary", "fleming_secondary"),
+                           width=800, height = 800, 
+                           root = "Software Types", 
+                           fontSize = 12,
+                           zoomable = FALSE,
+                           fillFun = colorspace::heat_hcl)
   })
+  
+  output$tree_sf <- renderCollapsibleTree({
+    collapsibleTreeSummary(df_no_na,
+                           hierarchy = c("summary_type", "main_type", "sub_type"),
+                           width=800, height = 1000,  
+                           root = "Software Types", 
+                           fontSize = 12,
+                           zoomable = FALSE,
+                           attribute = "sourceforge_count",
+                           fillFun = colorspace::heat_hcl)
+  })
+  
+  
+  # output$collapsible_tree <- renderPlot({
+  #     collapsibleTreeSummary(df_no_na,
+  #     hierarchy = c("summary_type", "main_type", "sub_type"),
+  #     width=800, height = 1000,  
+  #     root = "Software Types", 
+  #     fontSize = 20,
+  #     zoomable = FALSE,
+  #     attribute = "sourceforge_count",
+  #     fillFun = colorspace::heat_hcl)
+  # })
   
   var <- reactive({
     input$sociodrop
