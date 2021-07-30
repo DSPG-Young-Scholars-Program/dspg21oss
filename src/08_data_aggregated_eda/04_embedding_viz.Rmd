@@ -24,20 +24,48 @@ library("readr")
 library("tidyverse")
 library("DT")
 library("RPostgreSQL")
+library(ggforce)
 ```
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 setwd("/home/zz3hs/git/dspg21oss/data/dspg21oss/")
 embeddings <- read_csv("repo_embedding_3d_pca.csv")
 
-label <- read_csv("github_repos_157k_label.csv")
+#label <- read_csv("github_repos_157k_label.csv")
+corpus_label <- read_csv("oss_software_labelled.csv")
 ```
 
 # Clean label
 ```{r}
-colnames(label)
+ids = colnames(corpus_label)
+ids
+
+corpus_ids = c()
+for (i in (1:length(ids))){
+  id = ids[i]
+  if (grepl("label", id)){
+    corpus_ids <- append(corpus_ids, id) 
+  }
+}
+
+corpus_ids
+corpus_label_true <- corpus_label%>%
+  select(slug, corpus_ids)%>%
+  gather(software_type, IS_TRUE,-slug)%>%
+  mutate(IS_TRUE= ifelse(IS_TRUE >0, T, F))%>%
+  right_join(embeddings, by = "slug")%>%
+  filter(!is.na(IS_TRUE))
 
 
+ggplot(filter(corpus_label_true, software_type %in% c("blockchain_label", "database_label")), aes(x = x, y = y)) + 
+  geom_point()  + aes(colour = software_type) + 
+  theme(legend.position = "right") + 
+  labs(title = "First two principal components, ground truth")+
+  geom_mark_circle(aes(color = software_type))
+
+```
+
+```{r}
 tm_ids =  c("app_blockchain_tm", "app_database_tm", "prog_clang_tm","prog_java_tm", "prog_javascript_tm", "prog_php_tm", "prog_python_tm", "topics_ai_tm", "topics_dataviz_tm")
 
 bert_ids = c("topics_ai_bert", "app_blockchain_bert", "prog_clang_bert","app_database_bert", "topics_dataviz_bert", "prog_java_bert", "prog_javascript_bert", "prog_php_bert", "prog_python_bert")
@@ -47,8 +75,6 @@ label_true = label%>%
   select(-readme)
 
 table(label_true$software_type)
-
-
 ```
 
 # Clean embedding scores
@@ -75,7 +101,6 @@ embeddings_label = embeddings_label%>%
            string = software_type, pattern = "virtual"), yes = "system", no = category_type))
 
 
-library(ggforce)
 ggplot(embeddings_label, aes(x = x, y = y)) + geom_point()  + aes(colour = category_type) + theme(legend.position = "right") + labs(title = "First two principal components")+
   geom_mark_circle(aes(color = category_type))
 
@@ -127,5 +152,14 @@ slug_freq_true_tm =label_true%>%
 ggplot(slug_freq_true_tm, aes(x = N)) + 
   geom_histogram(binwidth = 0.54) + 
   labs(title = "How many software types a repo is classified") 
+```
+
+
+```{r}
+blockchain = label%>%
+  filter(software_type == "app_blockchain")%>%
+  filter(term_matching ==T)
+
+terms = c("bitcoin","etherium", "uniswap", "polkadot")
 ```
 
