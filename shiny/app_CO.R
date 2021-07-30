@@ -31,6 +31,7 @@ df_no_na <- df %>%
   filter(!is.na(sourceforge_count)) %>% 
   filter(!is.na(fleming_primary)) %>%
   filter(!is.na(fleming_secondary)) %>%
+  filter(main_type!="Undeveloped") %>% 
   mutate(main_type = replace(main_type, main_type=="" & summary_type!="Programming" & summary_type!="Other/Nonlisted Topic", "Other")) %>% 
   mutate(sub_type = replace(sub_type, sub_type=="" & summary_type!="Programming" & summary_type!="Other/Nonlisted Topic", "Other"))
 
@@ -201,7 +202,24 @@ statistics and READMEs from the top 250,000 repos ranked by the number of commit
                                             economists interested in evaluating the costs of broader, more general categories 
                                             as well as researchers interested in specialized, more specific categories. 
                                             Below, we used R’s collapsibleTree
-                                            package to visualize how these three levels of categorization fit together.")
+                                            package to visualize how these three levels of categorization fit together."),
+                                          h5(strong("Project Focus Software Categories")),
+                                          p("We chose to focus in on some of the top programming language software on GitHub and a
+                                            number of Application and Topic software categories. Below is a list of the specific 
+                                            software categories we focused on:"),
+                                          tags$ul(
+                                            tags$li("R"), 
+                                            tags$li("Python"), 
+                                            tags$li("C"),
+                                            tags$li("Javascript"),
+                                            tags$li("Java"),
+                                            tags$li("PHP"),
+                                            tags$li("Data Visualization"),
+                                            tags$li("Database Management"),
+                                            tags$li("Artificial Intelligence/Machine Learning"),
+                                            tags$li("Blockchain")
+                                          )
+                                          
                                    ),
                                    column(8, 
                                           h4(strong("Collapsible Trees")),
