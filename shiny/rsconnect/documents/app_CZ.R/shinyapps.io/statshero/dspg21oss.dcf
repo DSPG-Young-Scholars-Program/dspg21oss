@@ -5,8 +5,8 @@ account: statshero
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4433327
-bundleId: 4865270
+bundleId: 4872120
 url: https://statshero.shinyapps.io/dspg21oss/
-when: 1627492285.61149
+when: 1627652198.77114
 asMultiple: FALSE
 asStatic: FALSE

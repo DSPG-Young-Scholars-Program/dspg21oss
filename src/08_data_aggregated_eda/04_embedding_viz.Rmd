@@ -17,39 +17,37 @@ library(readr)
 library(dplyr)
 library(tidyr)
 library(mosaic)
+library("stringr")
+library("tidyr")
+library("dplyr")
+library("readr")
+library("tidyverse")
+library("DT")
+library("RPostgreSQL")
 ```
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 setwd("/home/zz3hs/git/dspg21oss/data/dspg21oss/")
 embeddings <- read_csv("repo_embedding_3d_pca.csv")
 
-label <- read_csv("oss_software_labelled.csv")
-
+label <- read_csv("github_repos_157k_label.csv")
 ```
 
 # Clean label
 ```{r}
 colnames(label)
 
-ls = c("prog_java", "prog_php", "prog_python", "prog_javascript", "prog_clang", "app_blockchain_all", "app_database_all", "topics_ai", "topics_dataviz")
 
-ls_corpus = c("ai_label", "blockchain_label","clang_label","database_label","dataviz_label","java_label","javascript_label","php_label","python_label")
+tm_ids =  c("app_blockchain_tm", "app_database_tm", "prog_clang_tm","prog_java_tm", "prog_javascript_tm", "prog_php_tm", "prog_python_tm", "topics_ai_tm", "topics_dataviz_tm")
+
+bert_ids = c("topics_ai_bert", "app_blockchain_bert", "prog_clang_bert","app_database_bert", "topics_dataviz_bert", "prog_java_bert", "prog_javascript_bert", "prog_php_bert", "prog_python_bert")
 
 label_true = label%>%
-  gather("software_type", "is_type",-slug)%>%
-  filter(software_type %in% ls)%>%
-  mutate(IS_TYPE = ifelse(is.na(is_type), F, T))%>%
-  filter(IS_TYPE==T)
+  filter(bert==T)%>%
+  select(-readme)
 
 table(label_true$software_type)
 
-label_corpus = label%>%
-  gather("software_type", "is_type",-slug)%>%
-  filter(software_type %in% ls_corpus)%>%
-  mutate(IS_TYPE_CORPUS = ifelse(is_type==1, T, F))%>%
-  filter(IS_TYPE_CORPUS==T)%>%
-  select(-is_type)
-table(label_corpus$software_type)
 
 ```
 
@@ -60,39 +58,31 @@ table(label_corpus$software_type)
 
 #Embeddings
 ```{r}
+
 embeddings_label = left_join(embeddings, label_true, by = "slug")
 embeddings_label = embeddings_label%>%
-  filter(!is.na(software_type))
+  filter(!is.na(software_type))%>% 
+  mutate(category_type = ifelse(test = str_detect(string = software_type, pattern = "^sys_"), yes = "system", no = ""),
+         category_type = ifelse(test = str_detect(
+           string = software_type, pattern = "^prog_"), yes = "programming", no = category_type),
+         category_type = ifelse(test = str_detect(
+           string = software_type, pattern = "^app_"), yes = "applications", no = category_type),
+         category_type = ifelse(test = str_detect(
+           string = software_type, pattern = "^topics_"), yes = "applications", no = category_type),
+         category_type = ifelse(test = str_detect(
+           string = software_type, pattern = "database"), yes = "system", no = category_type),
+         category_type = ifelse(test = str_detect(
+           string = software_type, pattern = "virtual"), yes = "system", no = category_type))
+
 
 library(ggforce)
-ggplot(embeddings_label, aes(x = x, y = y)) + geom_point()  + aes(colour = software_type) + theme(legend.position = "right") + labs(title = "First two principal components")+
-  geom_mark_circle(aes(color = software_type))
+ggplot(embeddings_label, aes(x = x, y = y)) + geom_point()  + aes(colour = category_type) + theme(legend.position = "right") + labs(title = "First two principal components")+
+  geom_mark_circle(aes(color = category_type))
 
-ggplot(embeddings_label, aes(x = y, y = z)) + geom_point()  + aes(colour = software_type) + theme(legend.position = "right") + labs(title =  "Second and third principal components")+
-  geom_mark_circle(aes(color = software_type))
+ggplot(embeddings_label, aes(x = y, y = z)) + geom_point()  + aes(colour = category_type) + theme(legend.position = "right") + labs(title = "First two principal components")+
+  geom_mark_circle(aes(color = category_type))
 ```
 
-#Embeddings_corpus
-```{r}
-table(label_corpus$software_type)
-
-embeddings_label = left_join(embeddings, label_corpus, by = "slug")
-embeddings_label = embeddings_label%>%
-  filter(!is.na(software_type))
-
-library(ggforce)
-ggplot(filter(embeddings_label, software_type %in% c("ai_label", "database_label","dataviz_label")), 
-       aes(x = x, y = y)) + 
-  geom_point()  + 
-  aes(colour = software_type) + 
-  theme(legend.position = "right") + 
-  labs(title = "First two principal components")+
-  geom_mark_circle(aes(color = software_type))
-
-ggplot(filter(embeddings_label, software_type %in% c("ai_label", "database_label","dataviz_label")) , 
-       aes(x = y, y = z)) + geom_point()  + aes(colour = software_type) + theme(legend.position = "right") + labs(title =  "Second and third principal components")+
-  geom_mark_circle(aes(color = software_type))
-```
 
 ## 3d plot using rgl
 ```{r}
@@ -119,5 +109,23 @@ colors <- colors_rgb[as.numeric(embeddings_label$software_type)]
 
 
 scatterplot3d(x=embeddings_label$x, y=embeddings_label$y, z=embeddings_label$z, color = colors)
+```
+
+```{r}
+slug_freq_true_bert =label_true%>%
+  group_by(slug)%>%
+  summarize(N = sum(bert))
+
+ggplot(slug_freq_true_bert, aes(x = N)) + 
+  geom_histogram(binwidth = 0.54) + 
+  labs(title = "How many software types a repo is classified") 
+
+slug_freq_true_tm =label_true%>%
+  group_by(slug)%>%
+  summarize(N = sum(term_matching))
+
+ggplot(slug_freq_true_tm, aes(x = N)) + 
+  geom_histogram(binwidth = 0.54) + 
+  labs(title = "How many software types a repo is classified") 
 ```
 
