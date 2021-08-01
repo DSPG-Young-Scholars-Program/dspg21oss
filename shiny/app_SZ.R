@@ -270,12 +270,32 @@ ui <- navbarPage(title = "OSS",
                           ),
                           tabsetPanel(
                             tabPanel("Supervised Text Mining",
-                                     h3("Supervised Text Mining", align = "center"),
-                                     br(""),
-                                     p("To classify the repositories scraped from GitHub, a nested dictonary approach was adopted following the classificaiton of software types. To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
-                                       Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
-                                       The figure below shows the results of this initial classification based on keyword."),
-                                     img(src='classificationBreakdown.png')),
+                                     h3(strong(""), align = "center"),
+                                     fluidRow(style='margin: 6px;',
+                                              column(6,
+                                                     h4(strong("Classification")),
+                                                     p("To classify the repositories scraped from GitHub, a nested dictonary approach was adopted following the classificaiton of software types. 
+                                                        To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
+                                                        Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. 
+                                                        From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
+                                                         The figures below show the results of this initial classification based on keyword for the 157k repositories scraped this summer, as well as based on the 
+                                                       original 10.3 million repository descriptions."),
+                                                     h4(strong("Limitations")),
+                                                     p("A major limitation of this method involves the prevelance of false positives and negatives that are detected. 
+                                                       Although it is possible that this could be mitigated with improved bigram and trigram detection as well as refining keywords used,
+                                                       it's unlikely that false positive and negatives will occur at a sufficiently low rate, even in the most ideal of circumstances
+                                                       We observe examples of a false positive and a false negative below, noticed during the validation process."),
+                                                     h4(strong("Example: False Positive")),
+                                                     p("The following respository", 
+                                                       a(href = "https://github.com/fsharp/fsharp", "F#")), "was incorrectly flagged as a Python repository
+                                                     based on the description."),
+                                                     h4(strong("Example 2: False Negative")),
+                                                     p("The following repository", 
+                                                       a(href = "https://github.com/apache/camel", "Apache Camel")),", an open source Java integration framework was not flagged as a Java repository.")
+                                                     ,
+                            column(6, h4("Figures"),
+                                   img(src='software_type_103.png', style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "500px"),
+                                   img(src='software_type_157.png', style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "500px"))),
                             tabPanel("Sentence Embeddings Estimation",  
                                      h3(strong(""), align = "center"),
                                      fluidRow(style = "margin: 6px;",
