@@ -80,20 +80,45 @@ table(label_true$software_type)
 bert_embeddings_label = left_join(label_true, embeddings, by = "slug")
 
 
-p1 <- ggplot(filter(bert_embeddings_label, software_type %in% c("app_blockchain", "topics_dataviz")), aes(x = x, y = y)) + 
+p1 <- ggplot(
+            filter(bert_embeddings_label, software_type %in% c("app_blockchain", "topics_dataviz")), 
+            aes(x=x, 
+                y=y,
+                slug = slug,
+                description = description,
+                software_type = software_type,
+                stars= stars)
+            ) + 
   geom_point()  + 
   aes(colour = software_type) + 
   theme(legend.position = "top") + 
   labs(title = "Embeddings of repos classified as Blockchain and Data Visualization", 
-       subtitle = "1st + 2nd principal components")
+       subtitle = "1st + 2nd principal components")+
+  theme_minimal()
 
-p2 <- ggplot(filter(bert_embeddings_label, software_type %in% c("app_blockchain", "topics_dataviz")), aes(x = y, y = z)) + 
+ply1 <- ggplotly(p1, tooltip = c("slug", "software_type", "description", "stars"))
+
+
+p2 <-ggplot(
+            filter(bert_embeddings_label, software_type %in% c("app_blockchain", "topics_dataviz")), 
+            aes(x=y, 
+                y=z,
+                slug = slug,
+                description = description,
+                software_type = software_type,
+                stars= stars)
+            ) + 
   geom_point()  + 
   aes(colour = software_type) + 
   theme(legend.position = "top") + 
   labs(title = "Embeddings of repos classified as Blockchain and Data Visualization", 
-       subtitle = "2nd + 3rd principal components")
-grid.arrange(p1, p2, nrow = 1)
+       subtitle = "2nd + 3rd principal components")+
+  theme_minimal()
+
+ply2 <- ggplotly(p2, tooltip = c("slug", "software_type", "description", "stars"))
+plys = subplot(ply1, ply2, nrows=1)
+
+plys
 ```
 
 

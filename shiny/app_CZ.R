@@ -16,12 +16,14 @@ if(!require(stringr)) install.packages("stringr", repos = "http://cran.us.r-proj
 if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
 if(!require(collapsibleTree)) install.packages("collapsibleTree", repos = "http://cran.us.r-project.org")
 
+if(!require(plotly)) install.packages("plotly", repos = "http://cran.us.r-project.org")
+if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
 
-prettyblue <- "#232D4B"
-navBarBlue <- '#427EDC'
-#options(spinner.color = prettyblue, spinner.color.background = '#ffffff', spinner.size = 3, spinner.type = 7)
 
-colors <- c("#232d4b","#2c4f6b","#0e879c","#60999a","#d1e0bf","#d9e12b","#e6ce3a","#e6a01d","#e57200","#fdfdfd")
+#setwd("/home/zz3hs/git/dspg21oss/shiny")
+
+#exclude white color
+uva_colors <- c("#232d4b","#2c4f6b","#0e879c","#60999a","#d1e0bf","#d9e12b","#e6ce3a","#e6a01d","#e57200")
 
 # data -----------------------------------------------------------
 
@@ -38,7 +40,19 @@ df_no_na <- df %>%
 # bert embedding 
 embeddings <- read_rds("data_shiny/classified_repos_embeddings.rds")
 label_true <- read_rds("data_shiny/classified_repos_labelled.rds")
+repo_scores <- read_rds("data_shiny/repo_score.rds")
+repo_scores <- repo_scores%>%
+  select(-bert)
 
+bert_embeddings_label = label_true%>%
+  left_join(embeddings, by = "slug")%>%
+  left_join(repo_scores, by = c("slug", "software_type"))
+
+bert_embeddings_label$software_type <- as.factor(bert_embeddings_label$software_type)
+
+
+levels(bert_embeddings_label$software_type) <- c("app_blockchain", "prog_clang", "prog_java", "prog_javascript", "prog_php", "topics_ai", "prog_python", "app_database", "topics_dataviz")
+names(uva_colors) <- levels(bert_embeddings_label$software_type)
 
 # user -------------------------------------------------------------
 ui <- navbarPage(title = "OSS",
@@ -283,7 +297,7 @@ ui <- navbarPage(title = "OSS",
                             tabPanel("Sentence Embeddings Estimation",  
                                      h3(strong(""), align = "center"),
                                      fluidRow(style = "margin: 6px;",
-                                              column(6,
+                                              column(3,
                                                      h4(strong("Methods")),
                                                      h5(strong("I. Formulate Software Type Sentence Corpus")),
                                                      p("For each software type, we manually validated repository classifications. We prioritize the repositories
@@ -307,10 +321,34 @@ ui <- navbarPage(title = "OSS",
                                                         classify a repository with an embedding score that is 2 standard deviation above the mean as the corresponding software type." )
                                                      
                                                   ),
-                                       column(6, 
+                                       column(4, 
                                               h4(strong("Results")),
-                                              img(src = "bert_classification.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "800px")
-                                              
+                                              tabsetPanel(
+                                                tabPanel("Embedding Visualization",
+                                                         checkboxGroupInput("software_type", "Software Type:",
+                                                                            c("App-Blockchain"= "app_blockchain",
+                                                                              "App-Database"="app_database",
+                                                                              "Programming Language-clang"="prog_clang",
+                                                                              "Programming Language-Java"="prog_java",
+                                                                              "Programming Language-Javascript"= "prog_javascript",
+                                                                              "Programming Language-php"= "prog_php",
+                                                                              "Programming Language-Python"= "prog_python",
+                                                                              "Topics-Artificial Intelligence"= "topics_ai",
+                                                                              "Topics-Data Visualization"= "topics_dataviz")),
+                                                         #TODO: Work on the slider bar, reverse the filled color
+                                                         #https://community.rstudio.com/t/shiny-slider-new-design/24765
+                                                         sliderInput("similarity_score", "Similarity Score:",
+                                                                     min = 0, max = 1, value = 100
+                                                         ),
+                                                         plotlyOutput("embedding_plot", width = "800px", height = "700px")
+                                                         ),
+                                                tabPanel("Classification Results"),
+                                                tabPanel("Classification Results",
+                                                  img(src = "bert_classification.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "800px")
+                                                  
+                                                )
+                                              )
+
                                         )
                                     )
                                      
@@ -407,9 +445,57 @@ server <- function(input, output, session) {
                            fillFun = colorspace::heat_hcl)
   })
   
-  var <- reactive({
-    input$sociodrop
-  })
+  
+  # Tab: Classification Method, BERT------------------------------------------------
+   output$embedding_plot <- renderPlotly({
+     colScale <- scale_colour_manual(name = "software_type", values = uva_colors)
+     
+     p1 <- ggplot(
+       filter(bert_embeddings_label, software_type %in% input$software_type, similarity_score > input$similarity_score), 
+       aes(x=x, 
+           y=y,
+           slug = slug,
+           description = description,
+           software_type = software_type,
+           stars= stars)
+     ) + 
+       geom_point(aes(size = stars), alpha = 0.6) +
+       scale_size_continuous(range = c(0.5, 10))+ 
+       xlim(-2, 2)+
+       ylim(-2,2)+
+       aes(colour = software_type)  + 
+       labs(title = "Embeddings", 
+            subtitle = "1st + 2nd principal components")+
+       theme_minimal()+
+       colScale
+     
+     ply1 <- ggplotly(p1, tooltip = c("slug", "software_type", "description", "stars"))%>%
+       layout(legend = list(
+         orientation = "h"
+       )
+       )
+     
+     ply1
+     # p2 <-ggplot(
+     #   filter(bert_embeddings_label, software_type %in% input$software_type), 
+     #   aes(x=y, 
+     #       y=z,
+     #       slug = slug,
+     #       description = description,
+     #       software_type = software_type,
+     #       stars= stars)
+     # ) +
+     #   geom_point()  + 
+     #   aes(colour = software_type) + 
+     #   theme(legend.position = "none") + 
+     #   labs( title = "Embeddings", subtitle = "2nd + 3rd principal components")+
+     #   theme_minimal()
+     # 
+     # ply2 <- ggplotly(p2, tooltip = c("slug", "software_type", "description", "stars"))
+     # plys = subplot(ply1, ply2, nrows=1)
+     #plys
+   })
+  
   
 }
 
