@@ -16,16 +16,18 @@ if(!require(stringr)) install.packages("stringr", repos = "http://cran.us.r-proj
 if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
 if(!require(collapsibleTree)) install.packages("collapsibleTree", repos = "http://cran.us.r-project.org")
 
+if(!require(plotly)) install.packages("plotly", repos = "http://cran.us.r-project.org")
+if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
 
-prettyblue <- "#232D4B"
-navBarBlue <- '#427EDC'
-#options(spinner.color = prettyblue, spinner.color.background = '#ffffff', spinner.size = 3, spinner.type = 7)
 
-colors <- c("#232d4b","#2c4f6b","#0e879c","#60999a","#d1e0bf","#d9e12b","#e6ce3a","#e6a01d","#e57200","#fdfdfd")
+#setwd("/home/zz3hs/git/dspg21oss/shiny")
+
+#exclude white color
+uva_colors <- c("#232d4b","#2c4f6b","#0e879c","#60999a","#d1e0bf","#d9e12b","#e6ce3a","#e6a01d","#e57200")
 
 # data -----------------------------------------------------------
 
-# make tree ####
+# collapsible tree 
 df = read_csv("data_shiny/oss_software_types - dictionary.csv")
 df_no_na <- df %>% 
   filter(!is.na(sourceforge_count)) %>% 
@@ -35,6 +37,9 @@ df_no_na <- df %>%
   mutate(main_type = replace(main_type, main_type=="" & summary_type!="Programming" & summary_type!="Other/Nonlisted Topic", "Other")) %>% 
   mutate(sub_type = replace(sub_type, sub_type=="" & summary_type!="Programming" & summary_type!="Other/Nonlisted Topic", "Other"))
 
+
+networks<-read_csv("data_shiny/tsne_df.csv")
+networks<-networks %>% filter(language=="Python"|language == "Java"| language=="Javascript"| language=="PHP"| language=="C"|language=="Ruby")
 
 # user -------------------------------------------------------------
 ui <- navbarPage(title = "OSS",
@@ -107,28 +112,28 @@ ui <- navbarPage(title = "OSS",
                                             and evaluating how these different types of software are used within and across economic sectors. 
                                             Developing a procedure to classify repositories into categories will allow the NCSES to better determine the effect that variations in software 
                                             may have on OSS contribution activity, collaboration tendencies in networked ecosystems, or on the overall cost of OSS projects.")
-                                    ),
+                                          ),
                                    column(4,
                                           h2(strong("Our Approach")),
                                           p("In this project, we study GitHub - the world's largest code hosting repository platform. The platform has roughly 40 million 
                                             users and 190 million repositories - many of which we have scraped using our own open source tools. Our dataset includes descriptive statistics on 
                                             10.2 million repositories as well as more detailed text data (READMEs) on around 157,000 projects (see Data)."), 
                                           tags$li("To classify GitHub projects into software types, we developed term-matching algorithms to allocate repos into various categories. This typology was borrowed from the Bureau of Economic Analysis and 
-                                            Martin Fleming's (2021) proposed software categories that are generally useful for economists as well as more nuanced software categories. 
+                                                  Martin Fleming's (2021) proposed software categories that are generally useful for economists as well as more nuanced software categories. 
                                                   that we extracted from ", a(href = "https://sourceforge.net/", "SourceForge", target = "_blank"),", which are designed by and more arguably more useful for computer programmers to organize existing projects (see Software Types). 
                                                   For the 2021 DSPG summer project, we focused on 10 prominent OSS categories "), 
                                           tags$li("Third, we worked to validate that our approach generated accurate results by comparing manually validated repos to untagged repos through the use of Bidirectional Encodings 
                                                   through Representational Transformers (or ", a(href = "https://huggingface.co/transformers/model_doc/bert.html", "BERT", target = "_blank"),"). Generally, this approach allows us to embed sentences' meanings within a vector space to compare how similar 
-                                            the content is using a cosine similarity metric."), 
+                                                  the content is using a cosine similarity metric."), 
                                           tags$li("Finally, we used node embeddings (or ", a(href = "https://snap.stanford.edu/node2vec/", "node2vec", target = "_blank"),") to compare the similarity of repository collaboration 
-                                            networks based on common contributors. Like word embeddings, node embeddings place repos as vectors within a vector space with those that are 
-                                            most similar closest to one another. By combing these strategies, we hope to infer software types based on their collaboration networks and improve our abilities to 
-                                            classify GitHub repositories through a combination of these computational methods.")
+                                                  networks based on common contributors. Like word embeddings, node embeddings place repos as vectors within a vector space with those that are 
+                                                  most similar closest to one another. By combing these strategies, we hope to infer software types based on their collaboration networks and improve our abilities to 
+                                                  classify GitHub repositories through a combination of these computational methods.")
                                           )
                                           ),
                           fluidRow(align = "center",
                                    p(tags$small(em('Last updated: July 2021'))))
-                                   ),
+                                          ),
                  
                  # data -----------------------------------------------------------
                  tabPanel("Data",
@@ -177,8 +182,8 @@ ui <- navbarPage(title = "OSS",
                                             years to come. For this project, our main goal was to use the repository slug (owner/repo name), descriptions and 
                                             commit histories to learn more about the types of software being developed on GitHub's platform by classifying the projects 
                                             through the use of term-matching, sentence embeddings (i.e. BERT), and node embeddings (i.e. node2vec)."),
-                               
-                                            
+                                          
+                                          
                                           h4(strong("Repository Popularity and READMEs Data")),
                                           p("To supplement these repository descriptive data, we also developed two Python scripts to scrape repository ", 
                                             a(href = "https://github.com/DSPG-Young-Scholars-Program/dspg21oss/blob/main/src/01_scrape_readmes/03_scrape_repo_stats.ipynb", "popularity statistics", target = "_blank"),
@@ -199,8 +204,8 @@ ui <- navbarPage(title = "OSS",
                                             the edges correspond to the number of common collaborators between those repos. Given the size of the full network and the 
                                             computational limitations it presents for conducting node embedding, these collaboration networks were limited to the 
                                             repositories in the 157K subset mentioned above. After isolate nodes were removed, this network ended up being comprised of 416 nodes and 5,237 edges.")
-                                   ))
-                                   ),
+                                          ))
+                                          ),
                  
                  # software type, Cierra-----------------------------------------------------------
                  tabPanel("Software Types", value = "data",
@@ -259,7 +264,7 @@ ui <- navbarPage(title = "OSS",
                                    )
                                           )
                           ),
-                                            
+                 
                  
                  
                  # Classification Method-----------------------------------------------------------
@@ -272,13 +277,13 @@ ui <- navbarPage(title = "OSS",
                             tabPanel("Supervised Text Mining",
                                      h3(strong(""), align = "center"),
                                      fluidRow(style='margin: 6px;',
-                                              column(6,
+                                              column(5,
                                                      h4(strong("Classification")),
                                                      p("To classify the repositories scraped from GitHub, a nested dictonary approach was adopted following the classificaiton of software types. 
-                                                        To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
-                                                        Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. 
-                                                        From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
-                                                         The figures below show the results of this initial classification based on keyword for the 157k repositories scraped this summer, as well as based on the 
+                                                       To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
+                                                       Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. 
+                                                       From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
+                                                       The figures below show the results of this initial classification based on keyword for the 157k repositories scraped this summer, as well as based on the 
                                                        original 10.3 million repository descriptions."),
                                                      h4(strong("Limitations")),
                                                      p("A major limitation of this method involves the prevelance of false positives and negatives that are detected. 
@@ -287,15 +292,15 @@ ui <- navbarPage(title = "OSS",
                                                        We observe examples of a false positive and a false negative below, noticed during the validation process."),
                                                      h4(strong("Example: False Positive")),
                                                      p("The following respository", 
-                                                       a(href = "https://github.com/fsharp/fsharp", "F#")), "was incorrectly flagged as a Python repository
-                                                     based on the description."),
+                                                       a(href = "https://github.com/fsharp/fsharp", "F#"), "was incorrectly flagged as a Python repository
+                                                       based on the description."),
                                                      h4(strong("Example 2: False Negative")),
                                                      p("The following repository", 
-                                                       a(href = "https://github.com/apache/camel", "Apache Camel")),", an open source Java integration framework was not flagged as a Java repository.")
-                                                     ,
-                            column(6, h4("Figures"),
-                                   img(src='software_type_103.png', style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "500px"),
-                                   img(src='software_type_157.png', style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "500px"))),
+                                                       a(href = "https://github.com/apache/camel", "Apache Camel"),", an open source Java integration framework was not flagged as a Java repository."))
+                                              ,
+                                              column(7, h4(strong("Figures")),
+                                                     img(src='software_type_103.png', style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "650px"),
+                                                     img(src='software_type_157.png', style = "display: inline;  5px; border: 1px solid #C0C0C0;", width = "650px")))),
                             tabPanel("Sentence Embeddings Estimation",  
                                      h3(strong(""), align = "center"),
                                      fluidRow(style = "margin: 6px;",
@@ -310,123 +315,180 @@ ui <- navbarPage(title = "OSS",
                                                      p("We computed sentence embeddings using",
                                                        a(href = "https://www.sbert.net/", "Sentence BERT (SBERT)", target = "_blank"), 
                                                        "There are many pretrained models. We used ", 
-                                                        a(href = "https://www.sbert.net/docs/pretrained_models.html", " paraphrase-mpnet-base-v2", target = "_blank"), 
-                                                          "to embed repository descriptions in our corpus and repository descriptions of unlabelled repositories. 
+                                                       a(href = "https://www.sbert.net/docs/pretrained_models.html", " paraphrase-mpnet-base-v2", target = "_blank"), 
+                                                       "to embed repository descriptions in our corpus and repository descriptions of unlabelled repositories. 
                                                        We chose this model because it has the highest quality."),
                                                      
                                                      h5(strong("III. Compare Repo Descriptions to Sentence Corpus")),
-                                                    p("For each software type, we compared the similarity between sentence embeddings of our corpus to the remaining repository descriptions using cosine-similarity. 
-                                                        Cosine-similarity score ranges from 0 to 1, higher the score, more similar two sentences are to each 
-                                                        other. For repository (with a one-sentence repository description), we identified the top ten most similar 
-                                                        sentences from our sentence corpus and obtained their cosine-similarity scores. We then took the median of the ten scores
-                                                        and obtained an embedding score for each repository, indicating how similar the repository is to the corresponding software type. We 
-                                                        classify a repository with an embedding score that is 2 standard deviation above the mean as the corresponding software type." )
+                                                     p("For each software type, we compared the similarity between sentence embeddings of our corpus to the remaining repository descriptions using cosine-similarity. 
+                                                       Cosine-similarity score ranges from 0 to 1, higher the score, more similar two sentences are to each 
+                                                       other. For repository (with a one-sentence repository description), we identified the top ten most similar 
+                                                       sentences from our sentence corpus and obtained their cosine-similarity scores. We then took the median of the ten scores
+                                                       and obtained an embedding score for each repository, indicating how similar the repository is to the corresponding software type. We 
+                                                       classify a repository with an embedding score that is 2 standard deviation above the mean as the corresponding software type." )
                                                      
-                                                  ),
-                                       column(6, 
-                                              h4(strong("Results")),
-                                              img(src = "bert_classification.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "800px")
-                                              
-                                        )
-                                    )
+                                                     ),
+                                              column(6, 
+                                                     h4(strong("Results")),
+                                                     img(src = "bert_classification.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "800px")
+                                                     
+                                              )
+                                                     )
                                      
-                            ),
-                            tabPanel("Node2Vec Embeddings",  
-                                     h3(strong("Node2Vec Embeddings"), align = "center"), 
-                                     br(),
-                                     p("Based on a network of repositories (nodes) and collaberators (edges), the Node2Vec algorithm was used to generate embeddings.
-                                       As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on similarity in collaberators. To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions. As seen below
-                                       , repositories with the same language (indicated by color) are clustered together. The size of the node reflects degree centrality, which indicates how \"connected\" a node is."),
-                                     img(src='node2vec.png', align="center")
+                                                     ),
+                            tabPanel("Node Embeddings",  
+                                     h3(strong(""), align = "center"), 
+                                     fluidRow(style = "margin: 6px;",
+                                              column(6, 
+                                                     h4(strong("Network Descriptives")),
+                                                     p(strong("Number of Nodes:"),"416",br(),
+                                                       strong("Number of Edges:"), "5237",br(),
+                                                       strong("Transitivity:"), ".602", br(),
+                                                       strong("Density:"), ".06", br(),
+                                                       strong("Average Cluster:"), ".439", br()),
+                                              h4(strong("Node2Vec")),
+                                              p("Based on a network of repositories (nodes) and collaberators (edges), the Node2Vec algorithm was used to generate embeddings. This is done through the generation
+                                                of biased random walks from each node (weighted by a parameter alpha), and then using Word2Vec to generate the embeddings.
+                                                To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions, and the embeddings are plotted on a 2-D plane. 
+                                                As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on common collaberators, which then leads to repositories with shared collaborators clustering closer together. 
+                                                As seen below, repositories with the same language (indicated by color) are clustered together. The size of the node reflects degree centrality, which indicates how \"connected\" a node is.")),
+                                              column(6,h4(strong("Results")),
+                                                     plotlyOutput("nodeEmbedding", width = "800px", height = "700px")
+                                              )        
+                                     )
                             )
-                          )
-                 ),
-                 # contact -----------------------------------------------------------
-                 tabPanel("Contact", value = "contact",
-                          fluidRow(style = "margin-left: 100px; margin-right: 100px;",
-                                   h1(strong("Contact"), align = "center"),
-                                   br(),
-                                   h4(strong("UVA Data Science for the Public Good")),
-                                   p("The", a(href = 'https://biocomplexity.virginia.edu/social-decision-analytics/dspg-program', 'Data Science for the Public Good (DSPG) Young Scholars program', target = "_blank"), 
-                                     "is a summer immersive program held at the", a(href = 'https://biocomplexity.virginia.edu/social-decision-analytics', 'University of Virginia Biocomplexity Institute’s Social and Decision Analytics division (SDAD).'), 
-                                     "In its seventh year, the program engages students from across the country to work together on projects that address state, federal, and local government challenges around 
-                                     critical social issues relevant in the world today. DSPG young scholars conduct research at the intersection of statistics, computation, and the social sciences 
-                                     to determine how information generated within every community can be leveraged to improve quality of life and inform public policy. For more information on program 
-                                     highlights, how to apply, and our annual symposium, please visit", a(href = 'https://biocomplexity.virginia.edu/social-decision-analytics/dspg-program', 'the official Biocomplexity DSPG website.', target = "_blank")),
-                                   p("", style = "padding-top:10px;")
+                                     ),
+                          
+                          # contact -----------------------------------------------------------
+                          tabPanel("Contact", value = "contact",
+                                   fluidRow(style = "margin-left: 100px; margin-right: 100px;",
+                                            h1(strong("Contact"), align = "center"),
+                                            br(),
+                                            h4(strong("UVA Data Science for the Public Good")),
+                                            p("The", a(href = 'https://biocomplexity.virginia.edu/social-decision-analytics/dspg-program', 'Data Science for the Public Good (DSPG) Young Scholars program', target = "_blank"), 
+                                              "is a summer immersive program held at the", a(href = 'https://biocomplexity.virginia.edu/social-decision-analytics', 'University of Virginia Biocomplexity Institute’s Social and Decision Analytics division (SDAD).'), 
+                                              "In its seventh year, the program engages students from across the country to work together on projects that address state, federal, and local government challenges around 
+                                              critical social issues relevant in the world today. DSPG young scholars conduct research at the intersection of statistics, computation, and the social sciences 
+                                              to determine how information generated within every community can be leveraged to improve quality of life and inform public policy. For more information on program 
+                                              highlights, how to apply, and our annual symposium, please visit", a(href = 'https://biocomplexity.virginia.edu/social-decision-analytics/dspg-program', 'the official Biocomplexity DSPG website.', target = "_blank")),
+                                            p("", style = "padding-top:10px;")
+                                            ),
+                                   fluidRow(style = "margin-left: 20px; margin-right: 20px;",
+                                            column(6, align = "center",
+                                                   h4(strong("DSPG Team Members")),
+                                                   img(src = "Crystal.jpeg", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
+                                                   img(src = "Cierra.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
+                                                   img(src = "Stephanie.png", style = "display: inline; border: 1px solid #C0C0C0;", width = "150px"),
+                                                   p(a(href = 'https://www.linkedin.com/in/crystal-zang', 'Crystal Zang', target = '_blank'), "(University of Pittsburgh Graduate School of Public Health, Biostatistics);",
+                                                     a(href = '', 'Cierra Oliveira', target = '_blank'), "(Clemson University, Computing and Applied Sciences);" ,
+                                                     a(href = '', 'Stephanie Zhang', target = '_blank'), "(University of Virginia, Mathematics (Probability/Statistics), Sociology);"),
+                                                   p("", style = "padding-top:10px;")
+                                            ),
+                                            column(6, align = "center",
+                                                   h4(strong("UVA SDAD Team Members")),
+                                                   img(src = "Brandon.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
+                                                   img(src = "Gizem.png", style = "display: inline; border: 1px solid #C0C0C0;", width = "150px"),
+                                                   p(a(href = "https://biocomplexity.virginia.edu/person/brandon-kramer", 'Brandon Kramer', target = '_blank'), "(Postdoctoral Research Associate);",
+                                                     a(href = "https://biocomplexity.virginia.edu/person/gizem-korkmaz", 'Gizem Korkmaz', target = '_blank'), "(Research Associate Professor);"),
+                                                   p("", style = "padding-top:10px;")
+                                            )
                                    ),
-                          fluidRow(style = "margin-left: 20px; margin-right: 20px;",
-                                   column(6, align = "center",
-                                          h4(strong("DSPG Team Members")),
-                                          img(src = "Crystal.jpeg", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
-                                          img(src = "Cierra.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
-                                          img(src = "Stephanie.png", style = "display: inline; border: 1px solid #C0C0C0;", width = "150px"),
-                                          p(a(href = 'https://www.linkedin.com/in/crystal-zang', 'Crystal Zang', target = '_blank'), "(University of Pittsburgh Graduate School of Public Health, Biostatistics);",
-                                            a(href = '', 'Cierra Oliveira', target = '_blank'), "(Clemson University, Computing and Applied Sciences);" ,
-                                            a(href = '', 'Stephanie Zhang', target = '_blank'), "(University of Virginia, Mathematics (Probability/Statistics), Sociology);"),
-                                          p("", style = "padding-top:10px;")
+                                   fluidRow(#style = "margin-left: 100px; margin-right: 100px;",
+                                     #style = "center",
+                                     column(12, align = "center",
+                                            h4(strong("Project Stakeholders")),
+                                            img(src = "Carol.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
+                                            img(src = "Ledia.png", style = "display: inline; border: 1px solid #C0C0C0;", width = "150px"),
+                                            p(a(href = '', 'Carol Robbins' , target = '_blank'), "(NCSES, Senior Analyst);"),
+                                            p(a(href = '', 'Ledia Guci', target = '_blank'), "(NCSES, Science Resource Analyst);"),
+                                            p("", style = "padding-top:10px;")
+                                     )
                                    ),
-                                   column(6, align = "center",
-                                          h4(strong("UVA SDAD Team Members")),
-                                          img(src = "Brandon.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
-                                          img(src = "Gizem.png", style = "display: inline; border: 1px solid #C0C0C0;", width = "150px"),
-                                          p(a(href = "https://biocomplexity.virginia.edu/person/brandon-kramer", 'Brandon Kramer', target = '_blank'), "(Postdoctoral Research Associate);",
-                                            a(href = "https://biocomplexity.virginia.edu/person/gizem-korkmaz", 'Gizem Korkmaz', target = '_blank'), "(Research Associate Professor);"),
-                                          p("", style = "padding-top:10px;")
-                                   )
-                          ),
-                          fluidRow(#style = "margin-left: 100px; margin-right: 100px;",
-                                        #style = "center",
-                                       column(12, align = "center",
-                                       h4(strong("Project Stakeholders")),
-                                       img(src = "Carol.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
-                                       img(src = "Ledia.png", style = "display: inline; border: 1px solid #C0C0C0;", width = "150px"),
-                                       p(a(href = '', 'Carol Robbins' , target = '_blank'), "(NCSES, Senior Analyst);"),
-                                       p(a(href = '', 'Ledia Guci', target = '_blank'), "(NCSES, Science Resource Analyst);"),
-                                       p("", style = "padding-top:10px;")
-                                        )
-                                   ),
-                          fluidRow(style = "margin-left: 20px; margin-right: 20px;",
-                                   style = "center",
-                                   h4(strong("Acknowledgments")),
-                                   p(" In addition to our appreciation to Carol Robbins, Ledia Guci, and Bayoán Santiago Calderón for their continued support of work on OSS,
-                                     we also want to thank Martin Fleming for joining us to talk about software classification.")
-                          )), 
-                 inverse = T)
-
-
-
-# server -----------------------------------------------------------
-server <- function(input, output, session) {
-  # Run JavaScript Code
-  #runjs(jscode)
-  
-  # Tab: Software Type, collapsible tree -----------------------------------------------------
-  output$tree_flemming <- renderCollapsibleTree({
-    collapsibleTreeSummary(df,
-                           hierarchy = c("fleming_primary", "fleming_secondary"),
-                           width=800, height = 800, 
-                           root = "Software Types", 
-                           fontSize = 12,
-                           zoomable = FALSE,
-                           fillFun = colorspace::heat_hcl)
-  })
-  
-  output$tree_sf <- renderCollapsibleTree({
-    collapsibleTreeSummary(df_no_na,
-                           hierarchy = c("summary_type", "main_type", "sub_type"),
-                           width=800, height = 1000,  
-                           root = "Software Types", 
-                           fontSize = 12,
-                           zoomable = FALSE,
-                           attribute = "sourceforge_count",
-                           fillFun = colorspace::heat_hcl)
-  })
-  
-  var <- reactive({
-    input$sociodrop
-  })
-  
-}
-
-shinyApp(ui = ui, server = server)
+                                   fluidRow(style = "margin-left: 20px; margin-right: 20px;",
+                                            style = "center",
+                                            h4(strong("Acknowledgments")),
+                                            p(" In addition to our appreciation to Carol Robbins, Ledia Guci, and Bayoán Santiago Calderón for their continued support of work on OSS,
+                                              we also want to thank Martin Fleming for joining us to talk about software classification.")
+                                            )), 
+                          inverse = T))
+                 
+                 
+                 
+                 # server -----------------------------------------------------------
+                 server <- function(input, output, session) {
+                   # Run JavaScript Code
+                   #runjs(jscode)
+                   
+                   # Tab: Software Type, collapsible tree -----------------------------------------------------
+                   output$tree_flemming <- renderCollapsibleTree({
+                     collapsibleTreeSummary(df,
+                                            hierarchy = c("fleming_primary", "fleming_secondary"),
+                                            width=800, height = 800, 
+                                            root = "Software Types", 
+                                            fontSize = 12,
+                                            zoomable = FALSE,
+                                            fillFun = colorspace::heat_hcl)
+                   })
+                   
+                   output$tree_sf <- renderCollapsibleTree({
+                     collapsibleTreeSummary(df_no_na,
+                                            hierarchy = c("summary_type", "main_type", "sub_type"),
+                                            width=800, height = 1000,  
+                                            root = "Software Types", 
+                                            fontSize = 12,
+                                            zoomable = FALSE,
+                                            attribute = "sourceforge_count",
+                                            fillFun = colorspace::heat_hcl)
+                   })
+                   
+                   
+                   # Tab: Classification Method, BERT------------------------------------------------
+                   output$nodeEmbedding <- renderPlotly({
+                     colScale <- scale_colour_manual(name = "software_type", values = uva_colors)
+                     
+                     p1 <- ggplot(
+                       networks,
+                       aes(x=x, 
+                           y=y,
+                           slug = slug,
+                           description = description,
+                           language = language)
+                     ) + 
+                       geom_point(aes(commits = page_rank), alpha = 0.6) +
+                       scale_size_continuous(range = c(0.5, 10))+ 
+                       xlim(-30, 30)+
+                       ylim(-30, 30)+
+                       aes(colour = language)  + 
+                       labs(title = "Node Embeddings")+
+                       theme_minimal()+colScale
+                     ply1 <- ggplotly(p1, tooltip = c("slug", "language", "description", "page_rank"))%>%
+                       layout(legend = list(
+                         orientation = "h"
+                       )
+                       )
+                     
+                     ply1
+                     # p2 <-ggplot(
+                     #   filter(bert_embeddings_label, software_type %in% input$software_type), 
+                     #   aes(x=y, 
+                     #       y=z,
+                     #       slug = slug,
+                     #       description = description,
+                     #       software_type = software_type,
+                     #       stars= stars)
+                     # ) +
+                     #   geom_point()  + 
+                     #   aes(colour = software_type) + 
+                     #   theme(legend.position = "none") + 
+                     #   labs( title = "Embeddings", subtitle = "2nd + 3rd principal components")+
+                     #   theme_minimal()
+                     # 
+                     # ply2 <- ggplotly(p2, tooltip = c("slug", "software_type", "description", "stars"))
+                     # plys = subplot(ply1, ply2, nrows=1)
+                     #plys
+                   })
+                   
+                   
+                 }
+                 
+                 shinyApp(ui = ui, server = server)
