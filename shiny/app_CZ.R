@@ -25,7 +25,7 @@ colors <- c("#232d4b","#2c4f6b","#0e879c","#60999a","#d1e0bf","#d9e12b","#e6ce3a
 
 # data -----------------------------------------------------------
 
-# make tree ####
+# collapsible tree 
 df = read_csv("data_shiny/oss_software_types - dictionary.csv")
 df_no_na <- df %>% 
   filter(!is.na(sourceforge_count)) %>% 
@@ -34,6 +34,10 @@ df_no_na <- df %>%
   filter(main_type!="Undeveloped") %>% 
   mutate(main_type = replace(main_type, main_type=="" & summary_type!="Programming" & summary_type!="Other/Nonlisted Topic", "Other")) %>% 
   mutate(sub_type = replace(sub_type, sub_type=="" & summary_type!="Programming" & summary_type!="Other/Nonlisted Topic", "Other"))
+
+# bert embedding 
+embeddings <- read_rds("data_shiny/classified_repos_embeddings.rds")
+label_true <- read_rds("data_shiny/classified_repos_labelled.rds")
 
 
 # user -------------------------------------------------------------
