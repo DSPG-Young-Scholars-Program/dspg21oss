@@ -339,7 +339,7 @@ ui <- navbarPage(title = "OSS",
                             tabPanel("Node Embeddings",  
                                      h3(strong(""), align = "center"), 
                                      fluidRow(style = "margin: 6px;",
-                                              column(6, 
+                                              column(5, 
                                                      h4(strong("Network Descriptives")),
                                                      p(strong("Number of Nodes:"),"416",br(),
                                                        strong("Number of Edges:"), "5237",br(),
@@ -352,12 +352,12 @@ ui <- navbarPage(title = "OSS",
                                                 To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions, and the embeddings are plotted on a 2-D plane. 
                                                 As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on common collaberators, which then leads to repositories with shared collaborators clustering closer together. 
                                                 As seen below, repositories with the same language (indicated by color) are clustered together. The size of the node reflects degree centrality, which indicates how \"connected\" a node is.")),
-                                              column(6,h4(strong("Results")),
+                                              column(7,h4(strong("Results")),
                                                      plotlyOutput("nodeEmbedding", width = "800px", height = "700px")
                                               )        
                                      )
                             )
-                                     ),
+                                     )),
                           
                           # contact -----------------------------------------------------------
                           tabPanel("Contact", value = "contact",
@@ -409,11 +409,8 @@ ui <- navbarPage(title = "OSS",
                                             h4(strong("Acknowledgments")),
                                             p(" In addition to our appreciation to Carol Robbins, Ledia Guci, and Bayoán Santiago Calderón for their continued support of work on OSS,
                                               we also want to thank Martin Fleming for joining us to talk about software classification.")
-                                            )), 
-                          inverse = T))
-                 
-                 
-                 
+                                            )))
+    
                  # server -----------------------------------------------------------
                  server <- function(input, output, session) {
                    # Run JavaScript Code
