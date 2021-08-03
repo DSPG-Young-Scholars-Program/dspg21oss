@@ -257,7 +257,7 @@ ui <- navbarPage(title = "OSS",
                                             number of Application and Topic software categories. Below is a list of the specific 
                                             software categories we focused on:"),
                                           tags$ul(
-                                            tags$li("R"), 
+                                            tags$li("Ruby"), 
                                             tags$li("Python"), 
                                             tags$li("C"),
                                             tags$li("Javascript"),
@@ -290,12 +290,28 @@ ui <- navbarPage(title = "OSS",
                           ),
                           tabsetPanel(
                             tabPanel("Supervised Text Mining",
-                                     h3("Supervised Text Mining", align = "center"),
-                                     br(""),
-                                     p("To classify the repositories scraped from GitHub, a nested dictonary approach was adopted following the classificaiton of software types. To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
-                                       Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
-                                       The figure below shows the results of this initial classification based on keyword."),
-                                     img(src='classificationBreakdown.png')),
+                                     h3(strong(""), align = "center"),
+                                     fluidRow(style='margin: 6px;',
+                                              column(5,
+                                                     h4(strong("Classification")),
+                                                     p("To classify the repositories scraped from GitHub, a nested dictonary approach was adopted following the classificaiton of software types. 
+                                                       To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
+                                                       Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. 
+                                                       From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
+                                                       The figures below show the results of this initial classification based on keyword for the 157k repositories scraped this summer, as well as based on the 
+                                                       original 10.3 million repository descriptions."),
+                                                     h4(strong("Limitations")),
+                                                     p("A major limitation of this method involves the prevelance of false positives and negatives that are detected. ,We observe examples of a false positive and a false negative below, noticed during the validation process."),
+                                                     h4(strong("Example: False Positive")),
+                                                     p("The following respository", 
+                                                       a(href = "https://github.com/fsharp/fsharp", "F#"), "was incorrectly flagged as a Python repository
+                                                       based on the description."),
+                                                     h4(strong("Example 2: False Negative")),
+                                                     p("The following repository", 
+                                                       a(href = "https://github.com/apache/camel", "Apache Camel"),", an open source Java integration framework was not flagged as a Java repository.")),
+                                              column(7, h4(strong("Figures")),
+                                                     img(src='software_type_103.png', style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "650px"),
+                                                     img(src='software_type_157.png', style = "display: inline;  5px; border: 1px solid #C0C0C0;", width = "650px")))),
                             tabPanel("Sentence Embeddings Estimation",  
                                      h3(strong(""), align = "center"),
                                      fluidRow(style = "margin: 6px;",
@@ -511,6 +527,32 @@ server <- function(input, output, session) {
      #plys
    })
   
+  output$nodeEmbedding <- renderPlotly({
+    colScale <- scale_colour_manual(name = "software_type", values = uva_colors)
+    
+    p2 <- ggplot(
+      networks,
+      aes(x=x, 
+          y=y,
+          slug = slug,
+          description = description,
+          language = language)
+    ) + 
+      geom_point(aes(commits = page_rank), alpha = 0.6) +
+      scale_size_continuous(range = c(0.5, 10))+ 
+      xlim(-30, 30)+
+      ylim(-30, 30)+
+      aes(colour = language)  + 
+      labs(title = "Node Embeddings")+
+      theme_minimal()+colScale
+    ply2 <- ggplotly(p2, tooltip = c("slug", "language", "description", "page_rank"))%>%
+      layout(legend = list(
+        orientation = "h"
+      )
+      )
+    
+    ply2
+  })
   
 }
 
