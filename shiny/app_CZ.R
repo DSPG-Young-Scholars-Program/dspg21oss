@@ -20,7 +20,7 @@ if(!require(plotly)) install.packages("plotly", repos = "http://cran.us.r-projec
 if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
 
 
-#setwd("/home/zz3hs/git/dspg21oss/shiny")
+#setwd("/Users/czang/Documents/UVA/2021DSPG/dspg21oss/shiny")
 
 #exclude white color
 uva_colors <- c("#232d4b","#2c4f6b","#0e879c","#60999a","#d1e0bf","#d9e12b","#e6ce3a","#e6a01d","#e57200")
@@ -48,11 +48,13 @@ bert_embeddings_label = label_true%>%
   left_join(embeddings, by = "slug")%>%
   left_join(repo_scores, by = c("slug", "software_type"))
 
-bert_embeddings_label$software_type <- as.factor(bert_embeddings_label$software_type)
+bert_embeddings_label$software_type <- factor(bert_embeddings_label$software_type, levels=c("app_blockchain", "prog_clang", "prog_java", "prog_javascript", "prog_php", "topics_ai", "prog_python", "app_database", "topics_dataviz"))
 
-
-levels(bert_embeddings_label$software_type) <- c("app_blockchain", "prog_clang", "prog_java", "prog_javascript", "prog_php", "topics_ai", "prog_python", "app_database", "topics_dataviz")
 names(uva_colors) <- levels(bert_embeddings_label$software_type)
+
+networks<-read_csv("data_shiny/tsne_df.csv")
+networks<-networks %>% filter(language=="Python"|language == "Java"| language=="Javascript"| language=="PHP"| language=="C"|language=="Ruby")
+
 
 # user -------------------------------------------------------------
 ui <- navbarPage(title = "OSS",
@@ -353,13 +355,26 @@ ui <- navbarPage(title = "OSS",
                                     )
                                      
                             ),
-                            tabPanel("Node2Vec Embeddings",  
-                                     h3(strong("Node2Vec Embeddings"), align = "center"), 
-                                     br(),
-                                     p("Based on a network of repositories (nodes) and collaberators (edges), the Node2Vec algorithm was used to generate embeddings.
-                                       As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on similarity in collaberators. To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions. As seen below
-                                       , repositories with the same language (indicated by color) are clustered together. The size of the node reflects degree centrality, which indicates how \"connected\" a node is."),
-                                     img(src='node2vec.png', align="center")
+                            tabPanel("Node Embeddings",  
+                                     h3(strong(""), align = "center"), 
+                                     fluidRow(style = "margin: 6px;",
+                                              column(5, 
+                                                     h4(strong("Network Descriptives")),
+                                                     p(strong("Number of Nodes:"),"416",br(),
+                                                       strong("Number of Edges:"), "5237",br(),
+                                                       strong("Transitivity:"), ".602", br(),
+                                                       strong("Density:"), ".06", br(),
+                                                       strong("Average Cluster:"), ".439", br()),
+                                                     h4(strong("Node2Vec")),
+                                                     p("Based on a network of repositories (nodes) and collaberators (edges), the Node2Vec algorithm was used to generate embeddings. This is done through the generation
+                                                of biased random walks from each node (weighted by a parameter alpha), and then using Word2Vec to generate the embeddings.
+                                                To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions, and the embeddings are plotted on a 2-D plane. 
+                                                As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on common collaberators, which then leads to repositories with shared collaborators clustering closer together. 
+                                                As seen below, repositories with the same language (indicated by color) are clustered together. The size of the node reflects degree centrality, which indicates how \"connected\" a node is.")),
+                                              column(7,h4(strong("Results")),
+                                                     plotlyOutput("nodeEmbedding", width = "800px", height = "700px")
+                                              )
+                                     )
                             )
                           )
                  ),
