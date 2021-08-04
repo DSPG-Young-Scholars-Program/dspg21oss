@@ -113,7 +113,7 @@ ui <- navbarPage(title = "OSS",
                                             current measures of innovation tend to rely on survey data, patent issues, trademarks approvals, intangible asset data, 
                                             or estimates of total factor productivity growth, these measures are either incomplete or 
                                             fail to capture innovation that is freely available to the public.")
-                                          ),
+                                   ),
                                    column(4,
                                           h2(strong("Project Overview")),
                                           p("To address this gap, the NCSES is interested in evaluating the economic and social impact of 
@@ -127,7 +127,7 @@ ui <- navbarPage(title = "OSS",
                                             and evaluating how these different types of software are used within and across economic sectors. 
                                             Developing a procedure to classify repositories into categories will allow the NCSES to better determine the effect that variations in software 
                                             may have on OSS contribution activity, collaboration tendencies in networked ecosystems, or on the overall cost of OSS projects.")
-                                    ),
+                                   ),
                                    column(4,
                                           h2(strong("Our Approach")),
                                           p("In this project, we study GitHub - the world's largest code hosting repository platform. The platform has roughly 40 million 
@@ -144,11 +144,11 @@ ui <- navbarPage(title = "OSS",
                                             networks based on common contributors. Like word embeddings, node embeddings place repos as vectors within a vector space with those that are 
                                             most similar closest to one another. By combing these strategies, we hope to infer software types based on their collaboration networks and improve our abilities to 
                                             classify GitHub repositories through a combination of these computational methods.")
-                                          )
-                                          ),
+                                   )
+                          ),
                           fluidRow(align = "center",
                                    p(tags$small(em('Last updated: July 2021'))))
-                                   ),
+                 ),
                  
                  # data -----------------------------------------------------------
                  tabPanel("Data",
@@ -168,7 +168,7 @@ ui <- navbarPage(title = "OSS",
                                             have aimed to collect code development activity more broadly, we are interested in examining a subset of GitHub repositories 
                                             with licenses that explicitly designate them as open source. OSS licenses allow software to be freely used, modified, and shared, 
                                             providing value for that software to be replicated and repurposed for a wide variety of purposes.")
-                                          ),
+                                   ),
                                    column(6,
                                           
                                           h4(strong("Overaching Methodology")),
@@ -197,8 +197,8 @@ ui <- navbarPage(title = "OSS",
                                             years to come. For this project, our main goal was to use the repository slug (owner/repo name), descriptions and 
                                             commit histories to learn more about the types of software being developed on GitHub's platform by classifying the projects 
                                             through the use of term-matching, sentence embeddings (i.e. BERT), and node embeddings (i.e. node2vec)."),
-                               
-                                            
+                                          
+                                          
                                           h4(strong("Repository Popularity and READMEs Data")),
                                           p("To supplement these repository descriptive data, we also developed two Python scripts to scrape repository ", 
                                             a(href = "https://github.com/DSPG-Young-Scholars-Program/dspg21oss/blob/main/src/01_scrape_readmes/03_scrape_repo_stats.ipynb", "popularity statistics", target = "_blank"),
@@ -220,7 +220,7 @@ ui <- navbarPage(title = "OSS",
                                             computational limitations it presents for conducting node embedding, these collaboration networks were limited to the 
                                             repositories in the 157K subset mentioned above. After isolate nodes were removed, this network ended up being comprised of 416 nodes and 5,237 edges.")
                                    ))
-                                   ),
+                 ),
                  
                  # software type, Cierra-----------------------------------------------------------
                  tabPanel("Software Types", value = "data",
@@ -269,7 +269,7 @@ ui <- navbarPage(title = "OSS",
                                             tags$li("Blockchain")
                                           )
                                           
-                                          ),
+                                   ),
                                    column(8, 
                                           h4(strong("Collapsible Trees")),
                                           h6(strong("Fleming Classification Schema")),
@@ -277,9 +277,9 @@ ui <- navbarPage(title = "OSS",
                                           h6(strong("Source Forge Classification Schema")),
                                           collapsibleTreeOutput("tree_sf")
                                    )
-                                          )
-                          ),
-                                            
+                          )
+                 ),
+                 
                  
                  
                  # Classification Method-----------------------------------------------------------
@@ -326,49 +326,49 @@ ui <- navbarPage(title = "OSS",
                                                      p("We computed sentence embeddings using",
                                                        a(href = "https://www.sbert.net/", "Sentence BERT (SBERT)", target = "_blank"), 
                                                        "There are many pretrained models. We used ", 
-                                                        a(href = "https://www.sbert.net/docs/pretrained_models.html", " paraphrase-mpnet-base-v2", target = "_blank"), 
-                                                          "to embed repository descriptions in our corpus and repository descriptions of unlabelled repositories. 
+                                                       a(href = "https://www.sbert.net/docs/pretrained_models.html", " paraphrase-mpnet-base-v2", target = "_blank"), 
+                                                       "to embed repository descriptions in our corpus and repository descriptions of unlabelled repositories. 
                                                        We chose this model because it has the highest quality."),
                                                      
                                                      h5(strong("III. Compare Repo Descriptions to Sentence Corpus")),
-                                                    p("For each software type, we compared the similarity between sentence embeddings of our corpus to the remaining repository descriptions using cosine-similarity. 
+                                                     p("For each software type, we compared the similarity between sentence embeddings of our corpus to the remaining repository descriptions using cosine-similarity. 
                                                         Cosine-similarity score ranges from 0 to 1, higher the score, more similar two sentences are to each 
                                                         other. For repository (with a one-sentence repository description), we identified the top ten most similar 
                                                         sentences from our sentence corpus and obtained their cosine-similarity scores. We then took the median of the ten scores
                                                         and obtained an embedding score for each repository, indicating how similar the repository is to the corresponding software type. We 
                                                         classify a repository with an embedding score that is 2 standard deviation above the mean as the corresponding software type." )
                                                      
-                                                  ),
-                                       column(4, 
-                                              h4(strong("Results")),
-                                              tabsetPanel(
-                                                tabPanel("Embedding Visualization",
-                                                         checkboxGroupInput("software_type", "Software Type:",
-                                                                            c("App-Blockchain"= "app_blockchain",
-                                                                              "App-Database"="app_database",
-                                                                              "Programming Language-clang"="prog_clang",
-                                                                              "Programming Language-Java"="prog_java",
-                                                                              "Programming Language-Javascript"= "prog_javascript",
-                                                                              "Programming Language-php"= "prog_php",
-                                                                              "Programming Language-Python"= "prog_python",
-                                                                              "Topics-Artificial Intelligence"= "topics_ai",
-                                                                              "Topics-Data Visualization"= "topics_dataviz")),
-                                                         #TODO: Work on the slider bar, reverse the filled color
-                                                         #https://community.rstudio.com/t/shiny-slider-new-design/24765
-                                                         sliderInput("similarity_score", "Similarity Score:",
-                                                                     min = 0, max = 1, value = 100
-                                                         ),
-                                                         plotlyOutput("embedding_plot", width = "800px", height = "700px")
-                                                         ),
-                                                tabPanel("Classification Results"),
-                                                tabPanel("Classification Results",
-                                                  img(src = "bert_classification.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "800px")
-                                                  
-                                                )
+                                              ),
+                                              column(4, 
+                                                     h4(strong("Results")),
+                                                     tabsetPanel(
+                                                       tabPanel("Embedding Visualization",
+                                                                checkboxGroupInput("software_type", "Software Type:",
+                                                                                   c("App-Blockchain"= "app_blockchain",
+                                                                                     "App-Database"="app_database",
+                                                                                     "Programming Language-clang"="prog_clang",
+                                                                                     "Programming Language-Java"="prog_java",
+                                                                                     "Programming Language-Javascript"= "prog_javascript",
+                                                                                     "Programming Language-php"= "prog_php",
+                                                                                     "Programming Language-Python"= "prog_python",
+                                                                                     "Topics-Artificial Intelligence"= "topics_ai",
+                                                                                     "Topics-Data Visualization"= "topics_dataviz")),
+                                                                #TODO: Work on the slider bar, reverse the filled color
+                                                                #https://community.rstudio.com/t/shiny-slider-new-design/24765
+                                                                sliderInput("similarity_score", "Similarity Score:",
+                                                                            min = 0, max = 1, value = 100
+                                                                ),
+                                                                plotlyOutput("embedding_plot", width = "800px", height = "700px")
+                                                       ),
+                                                       tabPanel("Classification Results"),
+                                                       tabPanel("Classification Results",
+                                                                img(src = "bert_classification.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "800px")
+                                                                
+                                                       )
+                                                     )
+                                                     
                                               )
-
-                                        )
-                                    )
+                                     )
                                      
                             ),
                             tabPanel("Node Embeddings",  
@@ -407,7 +407,7 @@ ui <- navbarPage(title = "OSS",
                                      to determine how information generated within every community can be leveraged to improve quality of life and inform public policy. For more information on program 
                                      highlights, how to apply, and our annual symposium, please visit", a(href = 'https://biocomplexity.virginia.edu/social-decision-analytics/dspg-program', 'the official Biocomplexity DSPG website.', target = "_blank")),
                                    p("", style = "padding-top:10px;")
-                                   ),
+                          ),
                           fluidRow(style = "margin-left: 20px; margin-right: 20px;",
                                    column(6, align = "center",
                                           h4(strong("DSPG Team Members")),
@@ -429,16 +429,16 @@ ui <- navbarPage(title = "OSS",
                                    )
                           ),
                           fluidRow(#style = "margin-left: 100px; margin-right: 100px;",
-                                        #style = "center",
-                                       column(12, align = "center",
-                                       h4(strong("Project Stakeholders")),
-                                       img(src = "Carol.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
-                                       img(src = "Ledia.png", style = "display: inline; border: 1px solid #C0C0C0;", width = "150px"),
-                                       p(a(href = '', 'Carol Robbins' , target = '_blank'), "(NCSES, Senior Analyst);"),
-                                       p(a(href = '', 'Ledia Guci', target = '_blank'), "(NCSES, Science Resource Analyst);"),
-                                       p("", style = "padding-top:10px;")
-                                        )
-                                   ),
+                            #style = "center",
+                            column(12, align = "center",
+                                   h4(strong("Project Stakeholders")),
+                                   img(src = "Carol.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "150px"),
+                                   img(src = "Ledia.png", style = "display: inline; border: 1px solid #C0C0C0;", width = "150px"),
+                                   p(a(href = '', 'Carol Robbins' , target = '_blank'), "(NCSES, Senior Analyst);"),
+                                   p(a(href = '', 'Ledia Guci', target = '_blank'), "(NCSES, Science Resource Analyst);"),
+                                   p("", style = "padding-top:10px;")
+                            )
+                          ),
                           fluidRow(style = "margin-left: 20px; margin-right: 20px;",
                                    style = "center",
                                    h4(strong("Acknowledgments")),
@@ -478,54 +478,54 @@ server <- function(input, output, session) {
   
   
   # Tab: Classification Method, BERT------------------------------------------------
-   output$embedding_plot <- renderPlotly({
-     colScale <- scale_colour_manual(name = "software_type", values = uva_colors)
-     
-     p1 <- ggplot(
-       filter(bert_embeddings_label, software_type %in% input$software_type, similarity_score > input$similarity_score), 
-       aes(x=x, 
-           y=y,
-           slug = slug,
-           description = description,
-           software_type = software_type,
-           stars= stars)
-     ) + 
-       geom_point(aes(size = stars), alpha = 0.6) +
-       scale_size_continuous(range = c(0.5, 10))+ 
-       xlim(-2, 2)+
-       ylim(-2,2)+
-       aes(colour = software_type)  + 
-       labs(title = "Embeddings", 
-            subtitle = "1st + 2nd principal components")+
-       theme_minimal()+
-       colScale
-     
-     ply1 <- ggplotly(p1, tooltip = c("slug", "software_type", "description", "stars"))%>%
-       layout(legend = list(
-         orientation = "h"
-       )
-       )
-     
-     ply1
-     # p2 <-ggplot(
-     #   filter(bert_embeddings_label, software_type %in% input$software_type), 
-     #   aes(x=y, 
-     #       y=z,
-     #       slug = slug,
-     #       description = description,
-     #       software_type = software_type,
-     #       stars= stars)
-     # ) +
-     #   geom_point()  + 
-     #   aes(colour = software_type) + 
-     #   theme(legend.position = "none") + 
-     #   labs( title = "Embeddings", subtitle = "2nd + 3rd principal components")+
-     #   theme_minimal()
-     # 
-     # ply2 <- ggplotly(p2, tooltip = c("slug", "software_type", "description", "stars"))
-     # plys = subplot(ply1, ply2, nrows=1)
-     #plys
-   })
+  output$embedding_plot <- renderPlotly({
+    colScale <- scale_colour_manual(name = "software_type", values = uva_colors)
+    
+    p1 <- ggplot(
+      filter(bert_embeddings_label, software_type %in% input$software_type, similarity_score > input$similarity_score), 
+      aes(x=x, 
+          y=y,
+          slug = slug,
+          description = description,
+          software_type = software_type,
+          stars= stars)
+    ) + 
+      geom_point(aes(size = stars), alpha = 0.6) +
+      scale_size_continuous(range = c(0.5, 10))+ 
+      xlim(-2, 2)+
+      ylim(-2,2)+
+      aes(colour = software_type)  + 
+      labs(title = "Embeddings", 
+           subtitle = "1st + 2nd principal components")+
+      theme_minimal()+
+      colScale
+    
+    ply1 <- ggplotly(p1, tooltip = c("slug", "software_type", "description", "stars"))%>%
+      layout(legend = list(
+        orientation = "h"
+      )
+      )
+    
+    ply1
+    # p2 <-ggplot(
+    #   filter(bert_embeddings_label, software_type %in% input$software_type), 
+    #   aes(x=y, 
+    #       y=z,
+    #       slug = slug,
+    #       description = description,
+    #       software_type = software_type,
+    #       stars= stars)
+    # ) +
+    #   geom_point()  + 
+    #   aes(colour = software_type) + 
+    #   theme(legend.position = "none") + 
+    #   labs( title = "Embeddings", subtitle = "2nd + 3rd principal components")+
+    #   theme_minimal()
+    # 
+    # ply2 <- ggplotly(p2, tooltip = c("slug", "software_type", "description", "stars"))
+    # plys = subplot(ply1, ply2, nrows=1)
+    #plys
+  })
   
   output$nodeEmbedding <- renderPlotly({
     colScale <- scale_colour_manual(name = "software_type", values = uva_colors)

@@ -214,12 +214,17 @@ colnames(repo_score_wide) <- c("slug","topics_ai_bert", "app_blockchain_bert", "
 
 # Join term matching label and bert label
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+length(unique(github_repos_157k_label$slug))
+length(unique(repo_score_wide$slug))
+length(unique(repo_term_matching_label$slug))
+
 #original data merge with bert labels
 github_repos_157k_label =  left_join(github_repos_157k, repo_score_wide, by ="slug")
 
 #bert labelled data merge with term matching labels
 github_repos_157k_label = left_join(github_repos_157k_label, repo_term_matching_label, by ="slug")
 
+colnames(github_repos_157k_label)
 #fill in na with false
 github_repos_157k_label = github_repos_157k_label%>%
   mutate_each(funs(replace(., is.na(.), F)), app_blockchain_tm, app_database_tm,prog_clang_tm, prog_java_tm, prog_javascript_tm, prog_php_tm, prog_python_tm, topics_ai_tm, topics_dataviz_tm)
@@ -244,7 +249,7 @@ github_repos_157k_label_long = github_repos_157k_label%>%
                          ifelse(software_type %in% c("prog_javascript_bert", "prog_javascript_tm"), "prog_javascript",
                          ifelse(software_type %in% c("prog_php_bert", "prog_php_tm"), "prog_php",
                          ifelse(software_type %in% c("prog_python_bert", "prog_python_tm"), "prog_python", NA))))))))))
-
+sum(is.na(github_repos_157k_label_long$software_type))
 
 github_repos_157k_label_long <- github_repos_157k_label_long%>%
   spread(method, IS_TYPE)
@@ -260,6 +265,13 @@ github_repos_157k_label_long%>%
   datatable()
 
 #write.csv(github_repos_157k_label_long, "/project/class/bii_sdad_dspg/uva_2021/dspg21oss/github_repos_157k_label.csv", row.names = F)
+```
+
+# Check the repos that are classified as AI
+```{r}
+ai = github_repos_157k_label_long%>%
+  filter(software_type == "topics_ai")%>%
+  filter(bert == T)
 ```
 
 # Summarize count by software type
