@@ -24,6 +24,7 @@ if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran
 
 #exclude white color
 uva_colors <- c("#232d4b","#2c4f6b","#0e879c","#60999a","#d1e0bf","#d9e12b","#e6ce3a","#e6a01d","#e57200")
+uva_col_distinct<-c("#232d4b", "#0e879c", "#d9e12b", "#e6ce3a", "#e57200")
 
 # data -----------------------------------------------------------
 
@@ -52,9 +53,9 @@ names(uva_colors) <- levels(bert_embeddings_label$software_type)
 
 # node embeddings
 networks<-read_csv("data_shiny/tsne_df.csv")
-networks<-networks %>% filter(language=="Python"|language == "Java"| language=="Javascript"| language=="PHP"| language=="C"|language=="Ruby")
-
-
+networks<-networks %>% filter(language=="Python"|language == "Java"| language=="Javascript"| 
+                                language=="PHP"| language=="C"|language=="Ruby")
+names(uva_col_distinct)<-levels(networks$language)
 
 
 # user -------------------------------------------------------------
@@ -325,23 +326,23 @@ ui <- navbarPage(title = "OSS",
                                    h3(strong(""), align = "center"),
                                    fluidRow(style='margin: 6px;',
                                             column(5,
-                                                   h4(strong("Classification")),
+                                                   h3(strong("Classification")),
                                                    p("To classify the repositories scraped from GitHub, a nested dictonary approach was adopted following the classificaiton of software types. 
                                                        To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
                                                        Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. 
                                                        From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
                                                        The figures below show the results of this initial classification based on keyword for the 157k repositories scraped this summer, as well as based on the 
                                                        original 10.3 million repository descriptions."),
-                                                   h4(strong("Limitations")),
+                                                   h3(strong("Limitations")),
                                                    p("A major limitation of this method involves the prevelance of false positives and negatives that are detected. ,We observe examples of a false positive and a false negative below, noticed during the validation process."),
-                                                   h4(strong("Example: False Positive")),
+                                                   h5(strong("Example: False Positive")),
                                                    p("The following respository", 
                                                      a(href = "https://github.com/fsharp/fsharp", "F#"), "was incorrectly flagged as a Python repository
                                                        based on the description."),
-                                                   h4(strong("Example 2: False Negative")),
+                                                   h5(strong("Example 2: False Negative")),
                                                    p("The following repository", 
                                                      a(href = "https://github.com/apache/camel", "Apache Camel"),", an open source Java integration framework was not flagged as a Java repository.")),
-                                            column(7, h4(strong("Figures")),
+                                            column(7, h3(strong("Figures")),
                                                    img(src='software_type_103.png', style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "650px"),
                                                    img(src='software_type_157.png', style = "display: inline;  5px; border: 1px solid #C0C0C0;", width = "650px"))
                                             )
@@ -369,6 +370,8 @@ ui <- navbarPage(title = "OSS",
                                                         Cosine-similarity score ranges from 0 to 1, higher the score, more similar two sentences are to each 
                                                         other."),
                                                     
+                                              
+                                                    br(),
                                                     h5(strong("Example:")),
                                                        p("Transformers: State-of-the-art Natural Language Processing for Pytorch, TensorFlow, and JAX."), 
                                                     
@@ -381,7 +384,8 @@ ui <- navbarPage(title = "OSS",
                                                       p("Cosine-similarity score: 0.22. "),
                                                     
                                                       
-                                                    
+                                
+                                                    br(),
                                                      p("First and second sentences are describing natural language processing which obtained a higher cosine-similarity score between them. 
                                                        The last sentence is describing a data visualization tool, comparing it with sentence 1 gave us a cosine-similarity socre of 0.2."),
 
@@ -456,20 +460,28 @@ ui <- navbarPage(title = "OSS",
                                    h3(strong(""), align = "center"), 
                                    fluidRow(style = "margin: 6px;",
                                             column(5, 
-                                                   h4(strong("Network Descriptives")),
+                                                   h3(strong("Network Descriptives")),
                                                    p(strong("Number of Nodes:"),"416",br(),
                                                      strong("Number of Edges:"), "5237",br(),
                                                      strong("Transitivity:"), ".602", br(),
                                                      strong("Density:"), ".06", br(),
                                                      strong("Average Cluster:"), ".439", br()),
-                                                   h4(strong("Node2Vec")),
+                                                   h3(strong("Node2Vec")),
                                                    p("Based on a network of repositories (nodes) and collaberators (edges), the Node2Vec algorithm was used to generate embeddings. This is done through the generation
                                                 of biased random walks from each node (weighted by a parameter alpha), and then using Word2Vec to generate the embeddings.
                                                 To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions, and the embeddings are plotted on a 2-D plane. 
                                                 As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on common collaberators, which then leads to repositories with shared collaborators clustering closer together. 
                                                 As seen below, repositories with the same language (indicated by color) are clustered together. The size of the node reflects degree centrality, which indicates how \"connected\" a node is.")),
-                                            column(7,h4(strong("Results")),
-                                                   plotlyOutput("nodeEmbedding", width = "800px", height = "700px")
+                                            column(7,h3(strong("Results")),
+                                                   plotlyOutput("nodeEmbedding", width = "800px", height = "700px"),
+                                                   br(),
+                                                   br(),
+                                                   br(),
+                                                   br(),
+                                                   br(),
+                                                   br(),
+                                                   br(),
+                                                   br()
                                             )
                                           )
                                 )
@@ -599,8 +611,15 @@ server <- function(input, output, session) {
      ply1
    })
   
+  
+  # Tab: Classification Method, Node Embedding------------------------------------------------
+  
   output$nodeEmbedding <- renderPlotly({
-    colScale <- scale_colour_manual(name = "software_type", values = uva_colors)
+    colScale2 <- scale_colour_manual(name = "language", values = uva_col_distinct)
+    
+    dim1<-list(title="t-SNE Dimension 1", showgrid=FALSE)
+    
+    dim2<-list(title="t-SNE Dimension 2", showgrid=FALSE)
     
     p2 <- ggplot(
       networks,
@@ -610,18 +629,15 @@ server <- function(input, output, session) {
           description = description,
           language = language)
     ) + 
-      geom_point(aes(commits = page_rank), alpha = 0.6) +
+      geom_point(aes(size = commits), alpha = 0.6) +
       scale_size_continuous(range = c(0.5, 10))+ 
       xlim(-30, 30)+
       ylim(-30, 30)+
       aes(colour = language)  + 
       labs(title = "Node Embeddings")+
-      theme_minimal()+colScale
+      theme_minimal()+colScale2
     ply2 <- ggplotly(p2, tooltip = c("slug", "language", "description", "page_rank"))%>%
-      layout(legend = list(
-        orientation = "h"
-      )
-      )
+      layout(legend = list(orientation = "h")) %>% layout(xaxis=dim1, yaxis=dim2)
     
     ply2
   })
