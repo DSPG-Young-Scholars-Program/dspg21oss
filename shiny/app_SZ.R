@@ -24,6 +24,7 @@ if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran
 
 #exclude white color
 uva_colors <- c("#232d4b","#2c4f6b","#0e879c","#60999a","#d1e0bf","#d9e12b","#e6ce3a","#e6a01d","#e57200")
+uva_col_distinct<-c("#232d4b", "#0e879c", "#d9e12b", "#e6ce3a", "#e57200")
 
 # data -----------------------------------------------------------
 
@@ -530,7 +531,11 @@ server <- function(input, output, session) {
    })
   
   output$nodeEmbedding <- renderPlotly({
-    colScale <- scale_colour_manual(name = "language", values = uva_colors)
+    colScale2 <- scale_colour_manual(name = "language", values = uva_col_distinct)
+    
+    dim1<-list(title="t-SNE Dimension 1", showgrid=FALSE)
+    
+    dim2<-list(title="t-SNE Dimension 2", showgrid=FALSE)
     
     p2 <- ggplot(
       networks,
@@ -540,18 +545,15 @@ server <- function(input, output, session) {
           description = description,
           language = language)
     ) + 
-      geom_point(aes(commits = page_rank), alpha = 0.6) +
+      geom_point(aes(size = commits), alpha = 0.6) +
       scale_size_continuous(range = c(0.5, 10))+ 
       xlim(-30, 30)+
       ylim(-30, 30)+
       aes(colour = language)  + 
       labs(title = "Node Embeddings")+
-      theme_minimal()+colScale
+      theme_minimal()+colScale2
     ply2 <- ggplotly(p2, tooltip = c("slug", "language", "description", "page_rank"))%>%
-      layout(legend = list(
-        orientation = "h"
-      )
-      )
+      layout(legend = list(orientation = "h")) %>% layout(xaxis=dim1, yaxis=dim2)
     
     ply2
   })
