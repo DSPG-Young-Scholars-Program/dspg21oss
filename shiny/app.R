@@ -326,23 +326,23 @@ ui <- navbarPage(title = "OSS",
                                    h3(strong(""), align = "center"),
                                    fluidRow(style='margin: 6px;',
                                             column(5,
-                                                   h4(strong("Classification")),
+                                                   h3(strong("Classification")),
                                                    p("To classify the repositories scraped from GitHub, a nested dictonary approach was adopted following the classificaiton of software types. 
                                                        To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
                                                        Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. 
                                                        From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
                                                        The figures below show the results of this initial classification based on keyword for the 157k repositories scraped this summer, as well as based on the 
                                                        original 10.3 million repository descriptions."),
-                                                   h4(strong("Limitations")),
+                                                   h3(strong("Limitations")),
                                                    p("A major limitation of this method involves the prevelance of false positives and negatives that are detected. ,We observe examples of a false positive and a false negative below, noticed during the validation process."),
-                                                   h4(strong("Example: False Positive")),
+                                                   h5(strong("Example: False Positive")),
                                                    p("The following respository", 
                                                      a(href = "https://github.com/fsharp/fsharp", "F#"), "was incorrectly flagged as a Python repository
                                                        based on the description."),
-                                                   h4(strong("Example 2: False Negative")),
+                                                   h5(strong("Example 2: False Negative")),
                                                    p("The following repository", 
                                                      a(href = "https://github.com/apache/camel", "Apache Camel"),", an open source Java integration framework was not flagged as a Java repository.")),
-                                            column(7, h4(strong("Figures")),
+                                            column(7, h3(strong("Figures")),
                                                    img(src='software_type_103.png', style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "650px"),
                                                    img(src='software_type_157.png', style = "display: inline;  5px; border: 1px solid #C0C0C0;", width = "650px"))
                                             )
@@ -370,6 +370,8 @@ ui <- navbarPage(title = "OSS",
                                                         Cosine-similarity score ranges from 0 to 1, higher the score, more similar two sentences are to each 
                                                         other."),
                                                     
+                                              
+                                                    br(),
                                                     h5(strong("Example:")),
                                                        p("Transformers: State-of-the-art Natural Language Processing for Pytorch, TensorFlow, and JAX."), 
                                                     
@@ -382,7 +384,8 @@ ui <- navbarPage(title = "OSS",
                                                       p("Cosine-similarity score: 0.22. "),
                                                     
                                                       
-                                                    
+                                
+                                                    br(),
                                                      p("First and second sentences are describing natural language processing which obtained a higher cosine-similarity score between them. 
                                                        The last sentence is describing a data visualization tool, comparing it with sentence 1 gave us a cosine-similarity socre of 0.2."),
 
@@ -457,20 +460,28 @@ ui <- navbarPage(title = "OSS",
                                    h3(strong(""), align = "center"), 
                                    fluidRow(style = "margin: 6px;",
                                             column(5, 
-                                                   h4(strong("Network Descriptives")),
+                                                   h3(strong("Network Descriptives")),
                                                    p(strong("Number of Nodes:"),"416",br(),
                                                      strong("Number of Edges:"), "5237",br(),
                                                      strong("Transitivity:"), ".602", br(),
                                                      strong("Density:"), ".06", br(),
                                                      strong("Average Cluster:"), ".439", br()),
-                                                   h4(strong("Node2Vec")),
+                                                   h3(strong("Node2Vec")),
                                                    p("Based on a network of repositories (nodes) and collaberators (edges), the Node2Vec algorithm was used to generate embeddings. This is done through the generation
                                                 of biased random walks from each node (weighted by a parameter alpha), and then using Word2Vec to generate the embeddings.
                                                 To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions, and the embeddings are plotted on a 2-D plane. 
                                                 As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on common collaberators, which then leads to repositories with shared collaborators clustering closer together. 
                                                 As seen below, repositories with the same language (indicated by color) are clustered together. The size of the node reflects degree centrality, which indicates how \"connected\" a node is.")),
-                                            column(7,h4(strong("Results")),
-                                                   plotlyOutput("nodeEmbedding", width = "800px", height = "700px")
+                                            column(7,h3(strong("Results")),
+                                                   plotlyOutput("nodeEmbedding", width = "800px", height = "700px"),
+                                                   br(),
+                                                   br(),
+                                                   br(),
+                                                   br(),
+                                                   br(),
+                                                   br(),
+                                                   br(),
+                                                   br()
                                             )
                                           )
                                 )
