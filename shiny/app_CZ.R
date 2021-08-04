@@ -24,6 +24,7 @@ if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran
 
 #exclude white color
 uva_colors <- c("#232d4b","#2c4f6b","#0e879c","#60999a","#d1e0bf","#d9e12b","#e6ce3a","#e6a01d","#e57200")
+uva_col_distinct<-c("#232d4b", "#0e879c", "#d9e12b", "#e6ce3a", "#e57200")
 
 # data -----------------------------------------------------------
 
@@ -38,21 +39,24 @@ df_no_na <- df %>%
   mutate(sub_type = replace(sub_type, sub_type=="" & summary_type!="Programming" & summary_type!="Other/Nonlisted Topic", "Other"))
 
 # bert embedding 
-embeddings <- read_rds("data_shiny/classified_repos_embeddings.rds")
-label_true <- read_rds("data_shiny/classified_repos_labelled.rds")
-repo_scores <- read_rds("data_shiny/repo_score.rds")
+embeddings <- read_rds("data_shiny/classified_repos_embeddings.rds") #slug with x, y, z
+label_true <- read_rds("data_shiny/classified_repos_labelled.rds") #repos with labelled for each catrgory and only kept the ones is true for that category 
+repo_scores <- read_rds("data_shiny/repo_score.rds") #slug with similarity score
 repo_scores <- repo_scores%>%
   select(-bert)
-
 bert_embeddings_label = label_true%>%
   left_join(embeddings, by = "slug")%>%
   left_join(repo_scores, by = c("slug", "software_type"))
-
-bert_embeddings_label$software_type <- as.factor(bert_embeddings_label$software_type)
-
-
-levels(bert_embeddings_label$software_type) <- c("app_blockchain", "prog_clang", "prog_java", "prog_javascript", "prog_php", "topics_ai", "prog_python", "app_database", "topics_dataviz")
+bert_embeddings_label$software_type <- factor(bert_embeddings_label$software_type, levels =  c("app_blockchain", "prog_clang", "prog_java", "prog_javascript", "app_database", "topics_ai", "prog_python", "app_php", "topics_dataviz"))
+levels(bert_embeddings_label$software_type)
 names(uva_colors) <- levels(bert_embeddings_label$software_type)
+
+# node embeddings
+networks<-read_csv("data_shiny/tsne_df.csv")
+networks<-networks %>% filter(language=="Python"|language == "Java"| language=="Javascript"| 
+                                language=="PHP"| language=="C"|language=="Ruby")
+names(uva_col_distinct)<-levels(networks$language)
+
 
 # user -------------------------------------------------------------
 ui <- navbarPage(title = "OSS",
@@ -110,7 +114,11 @@ ui <- navbarPage(title = "OSS",
                                             it is challenging to account for software that is developed outside of traditional business contexts. Moreover, while 
                                             current measures of innovation tend to rely on survey data, patent issues, trademarks approvals, intangible asset data, 
                                             or estimates of total factor productivity growth, these measures are either incomplete or 
-                                            fail to capture innovation that is freely available to the public.")
+                                            fail to capture innovation that is freely available to the public."),
+                                          
+                                          img(src='oss.png', style = "display: ; margin-left: 60px; border: 1px solid #C0C0C0;", width = "300px")
+                                          
+                                    
                                           ),
                                    column(4,
                                           h2(strong("Project Overview")),
@@ -125,7 +133,9 @@ ui <- navbarPage(title = "OSS",
                                             and evaluating how these different types of software are used within and across economic sectors. 
                                             Developing a procedure to classify repositories into categories will allow the NCSES to better determine the effect that variations in software 
                                             may have on OSS contribution activity, collaboration tendencies in networked ecosystems, or on the overall cost of OSS projects.")
-                                    ),
+                                    
+                                         
+                                          ),
                                    column(4,
                                           h2(strong("Our Approach")),
                                           p("In this project, we study GitHub - the world's largest code hosting repository platform. The platform has roughly 40 million 
@@ -145,7 +155,7 @@ ui <- navbarPage(title = "OSS",
                                           )
                                           ),
                           fluidRow(align = "center",
-                                   p(tags$small(em('Last updated: July 2021'))))
+                                   p(tags$small(em('Last updated: August 2021'))))
                                    ),
                  
                  # data -----------------------------------------------------------
@@ -155,7 +165,10 @@ ui <- navbarPage(title = "OSS",
                                    h1(strong("Data Source and Collection"), align = "center"),
                                    p("", style = "padding-top:10px;"),
                                    column(4,
-                                          h4(strong("Data Source")),
+                                          h3(strong("Data Source"),
+                                             img(src='github_logo.png', style = "display: ; margin-left: 50px; border: 1px solid #C0C0C0;", width = "70px")
+                                          ),
+
                                           #h5(strong("GitHub")),
                                           p("Our data comes from", a(href = "https://www.github.com/", "GitHub", target = "_blank"),  
                                             "- the world's largest code hosting repository platform in the world. People develop, store, 
@@ -165,11 +178,16 @@ ui <- navbarPage(title = "OSS",
                                             and SourceForge (3.7M users). While other research projects, such as GHTorrent, GitHub Archive, and Software Heritage 
                                             have aimed to collect code development activity more broadly, we are interested in examining a subset of GitHub repositories 
                                             with licenses that explicitly designate them as open source. OSS licenses allow software to be freely used, modified, and shared, 
-                                            providing value for that software to be replicated and repurposed for a wide variety of purposes.")
-                                          ),
-                                   column(6,
+                                            providing value for that software to be replicated and repurposed for a wide variety of purposes."),
+                                          br(),
+                                          br(),
+                                          br(),
+                                           img(src='cats.png', style = "display: ; margin-left: 5px; border: 1px solid #C0C0C0;", width = "400px",align = "center")
                                           
-                                          h4(strong("Overaching Methodology")),
+                                          ),
+                                   column(8,
+                                          
+                                          h3(strong("Overaching Methodology")),
                                           p("To classify and examine GitHub repositories, we aimed to first collect a survey of all OSS repositories on GitHub in addition to 
                                             summaries of their commit activities and descriptive information such as repo descriptions and READMEs (see below). We then 
                                             developed algorithms that classified the repos into software types. This typology was borrowed from the Bureau of Economic Analysis and 
@@ -184,8 +202,10 @@ ui <- navbarPage(title = "OSS",
                                             networks based on common contributors. Like word embeddings, node embeddings place repos as vectors within a vector space with those that are 
                                             most similar closest to one another. By combing these strategies, we hope to infer software types based on their collaboration networks and improve our abilities to 
                                             classify GitHub repositories."),
-                                          
-                                          h4(strong("Repository Descriptive Data")),
+                                          br(),
+                                          br(),
+                                     
+                                          h3(strong("Repository Descriptive Data")),
                                           p("To establish our universe of OSS, we used a list of 29 Open-Source Initiative (OSI)-approved licenses 
                                             derived from the Ruby Gem Licensee on GitHub. Next, we developed an open source Julia package called", a(href = "https://uva-bi-sdad.github.io/GHOST.jl/dev/", "GHOST.jl", target = "_blank"), 
                                             "to scrape all the repos with these licenses, including the repository slug, license, description, primary language,
@@ -195,9 +215,12 @@ ui <- navbarPage(title = "OSS",
                                             years to come. For this project, our main goal was to use the repository slug (owner/repo name), descriptions and 
                                             commit histories to learn more about the types of software being developed on GitHub's platform by classifying the projects 
                                             through the use of term-matching, sentence embeddings (i.e. BERT), and node embeddings (i.e. node2vec)."),
-                               
-                                            
-                                          h4(strong("Repository Popularity and READMEs Data")),
+                                          img(src='facebook_react_repo_example.png', style = "display: ; margin-left: 5px; border: 1px solid #C0C0C0;", width = "800px"),
+                                          
+                                          br(),
+                                          br(),
+                                   
+                                          h3(strong("Repository Popularity and READMEs Data")),
                                           p("To supplement these repository descriptive data, we also developed two Python scripts to scrape repository ", 
                                             a(href = "https://github.com/DSPG-Young-Scholars-Program/dspg21oss/blob/main/src/01_scrape_readmes/03_scrape_repo_stats.ipynb", "popularity statistics", target = "_blank"),
                                             " and ", a(href = "https://github.com/DSPG-Young-Scholars-Program/dspg21oss/blob/main/src/01_scrape_readmes/02_scrape_readmes_requests_final.ipynb", "READMEs", target = "_blank"), 
@@ -209,14 +232,23 @@ ui <- navbarPage(title = "OSS",
                                             these repositories before joining these data sources together. Once we merged these data,
                                             our sample shrunk to 157,538 entries that had valid description and README entries. These data, in turn, were used to 
                                             classify software types using our term-matching and sentence embeddings."),
-                                          
-                                          h4(strong("Repository Network Data")),
+                                          img(src='facebook_react_readme_example.png', style = "display: ; margin-left: 5px; border: 1px solid #C0C0C0;", width = "700px"),
+                                          br(),
+                                          br(),
+                                         
+                                          h3(strong("Repository Network Data")),
                                           p("Finally, we decided to use a form of graph representational learning called node embeddings (specifically node2vec) to
                                             examine the similarity of projects based on their collaboration networks. Drawing from the commit activity data scraped 
                                             using the GHOST.jl package, we constructed a repository collaboration network where the nodes represent repositories and 
                                             the edges correspond to the number of common collaborators between those repos. Given the size of the full network and the 
                                             computational limitations it presents for conducting node embedding, these collaboration networks were limited to the 
-                                            repositories in the 157K subset mentioned above. After isolate nodes were removed, this network ended up being comprised of 416 nodes and 5,237 edges.")
+                                            repositories in the 157K subset mentioned above. After isolate nodes were removed, this network ended up being comprised of 416 nodes and 5,237 edges."),
+                                          br(),
+                                          br(),
+                                          br(),
+                                          br(),
+                                          br(),
+                                          br()
                                    ))
                                    ),
                  
@@ -225,7 +257,7 @@ ui <- navbarPage(title = "OSS",
                           h1(strong("Software Types"), align = "center"),
                           fluidRow(style = "margin: 6px;",
                                    column(4,
-                                          h4(strong("Classification")),
+                                          h3(strong("Classification")),
                                           p("The main objective of our project is to classify GitHub repositories
                                             into software types so that the NCSES and other federal statisticians 
                                             can better understand the economic evaluation of labor costs and 
@@ -250,12 +282,12 @@ ui <- navbarPage(title = "OSS",
                                             as well as researchers interested in specialized, more specific categories. 
                                             Below, we used R’s collapsibleTree
                                             package to visualize how these three levels of categorization fit together."),
-                                          h5(strong("Project Focus Software Categories")),
+                                          h4(strong("Project Focus Software Categories")),
                                           p("We chose to focus in on some of the top programming language software on GitHub and a
                                             number of Application and Topic software categories. Below is a list of the specific 
                                             software categories we focused on:"),
                                           tags$ul(
-                                            tags$li("R"), 
+                                            tags$li("Ruby"), 
                                             tags$li("Python"), 
                                             tags$li("C"),
                                             tags$li("Javascript"),
@@ -269,10 +301,10 @@ ui <- navbarPage(title = "OSS",
                                           
                                           ),
                                    column(8, 
-                                          h4(strong("Collapsible Trees")),
-                                          h6(strong("Fleming Classification Schema")),
+                                          h3(strong("Collapsible Trees")),
+                                          h4(strong("Fleming Classification Schema")),
                                           collapsibleTreeOutput("tree_flemming"),
-                                          h6(strong("Source Forge Classification Schema")),
+                                          h4(strong("Source Forge Classification Schema")),
                                           collapsibleTreeOutput("tree_sf")
                                    )
                                           )
@@ -284,27 +316,48 @@ ui <- navbarPage(title = "OSS",
                  tabPanel("Classification Methods", value = "data",
                           fluidRow(style = "margin: 6px;",
                                    h1(strong("Classification Methods"), align = "center"),
-                                   br()
-                          ),
-                          tabsetPanel(
-                            tabPanel("Supervised Text Mining",
-                                     h3("Supervised Text Mining", align = "center"),
-                                     br(""),
-                                     p("To classify the repositories scraped from GitHub, a nested dictonary approach was adopted following the classificaiton of software types. To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
-                                       Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
-                                       The figure below shows the results of this initial classification based on keyword."),
-                                     img(src='classificationBreakdown.png')),
+                                   p("", style = "padding-top:10px;"),
+                      tabsetPanel(
+                          # fluidRow(style = "margin: 6px;",
+                          #          h1(strong("Classification Methods"), align = "center"),
+                          #          br()
+                          # ),
+                          tabPanel("Term Matching",
+                                   h3(strong(""), align = "center"),
+                                   fluidRow(style='margin: 6px;',
+                                            column(5,
+                                                   h4(strong("Classification")),
+                                                   p("To classify the repositories scraped from GitHub, a nested dictonary approach was adopted following the classificaiton of software types. 
+                                                       To do so, a subset of the most popular programming languages on GitHub (Python, C, PHP, Java, Javascript) and applications (Blockchain, AI, Databases) were selected for further research. 
+                                                       Each was assigned a series of keywords, ranging from the name of the programming language or topic to popular topics tagged on scraped repositories, as well as popular packages for programming languages, interfaces or applications. 
+                                                       From this, term matching was used to 'flag' repository descriptions that contained these keywords, and thus, potentially belonged to the corresponding category. 
+                                                       The figures below show the results of this initial classification based on keyword for the 157k repositories scraped this summer, as well as based on the 
+                                                       original 10.3 million repository descriptions."),
+                                                   h4(strong("Limitations")),
+                                                   p("A major limitation of this method involves the prevelance of false positives and negatives that are detected. ,We observe examples of a false positive and a false negative below, noticed during the validation process."),
+                                                   h4(strong("Example: False Positive")),
+                                                   p("The following respository", 
+                                                     a(href = "https://github.com/fsharp/fsharp", "F#"), "was incorrectly flagged as a Python repository
+                                                       based on the description."),
+                                                   h4(strong("Example 2: False Negative")),
+                                                   p("The following repository", 
+                                                     a(href = "https://github.com/apache/camel", "Apache Camel"),", an open source Java integration framework was not flagged as a Java repository.")),
+                                            column(7, h4(strong("Figures")),
+                                                   img(src='software_type_103.png', style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "650px"),
+                                                   img(src='software_type_157.png', style = "display: inline;  5px; border: 1px solid #C0C0C0;", width = "650px"))
+                                            )
+                                   ),
                             tabPanel("Sentence Embeddings Estimation",  
                                      h3(strong(""), align = "center"),
                                      fluidRow(style = "margin: 6px;",
-                                              column(3,
-                                                     h4(strong("Methods")),
-                                                     h5(strong("I. Formulate Software Type Sentence Corpus")),
+                                              column(4,
+                                                     h3(strong("Methods")),
+                                                     h4(strong("I. Formulate Software Type Sentence Corpus")),
                                                      p("For each software type, we manually validated repository classifications. We prioritize the repositories
                                                        with large number of stars for validation and obtained about fifty validated repositories for each software type.
                                                        And we use the descriptions of these validated repositories as our corpus. We have one sentence corpus for each 
                                                        software type."),
-                                                     h5(strong("II. Calculate Sentence Embedding")),
+                                                     h4(strong("II. Calculate Sentence Embedding")),
                                                      p("We computed sentence embeddings using",
                                                        a(href = "https://www.sbert.net/", "Sentence BERT (SBERT)", target = "_blank"), 
                                                        "There are many pretrained models. We used ", 
@@ -312,57 +365,120 @@ ui <- navbarPage(title = "OSS",
                                                           "to embed repository descriptions in our corpus and repository descriptions of unlabelled repositories. 
                                                        We chose this model because it has the highest quality."),
                                                      
-                                                     h5(strong("III. Compare Repo Descriptions to Sentence Corpus")),
+                                                     h4(strong("III. Compare Repo Descriptions to Sentence Corpus using Cosine-Similarity Score")),
                                                     p("For each software type, we compared the similarity between sentence embeddings of our corpus to the remaining repository descriptions using cosine-similarity. 
                                                         Cosine-similarity score ranges from 0 to 1, higher the score, more similar two sentences are to each 
-                                                        other. For repository (with a one-sentence repository description), we identified the top ten most similar 
-                                                        sentences from our sentence corpus and obtained their cosine-similarity scores. We then took the median of the ten scores
-                                                        and obtained an embedding score for each repository, indicating how similar the repository is to the corresponding software type. We 
-                                                        classify a repository with an embedding score that is 2 standard deviation above the mean as the corresponding software type." )
+                                                        other."),
+                                                    
+                                                    h5(strong("Example:")),
+                                                       p("Transformers: State-of-the-art Natural Language Processing for Pytorch, TensorFlow, and JAX."), 
+                                                    
+                                                    h5(strong("Compare with Two Sentences:")),
+                                                      p(strong("Sentence A"), "An Natural Language Processing library for building bots, with entity extraction, sentiment analysis, automatic language identify, and so more."), 
+                                                      
+                                                      p("Cosine-similarity score: 0.62. "),
+                                                    
+                                                      p(strong("Sentence B"),"An implementation of the Grammar of Graphics in R."),
+                                                      p("Cosine-similarity score: 0.22. "),
+                                                    
+                                                      
+                                                    
+                                                     p("First and second sentences are describing natural language processing which obtained a higher cosine-similarity score between them. 
+                                                       The last sentence is describing a data visualization tool, comparing it with sentence 1 gave us a cosine-similarity socre of 0.2."),
+
+                                                      p("For repository (with a one-sentence repository description), we identified the top ten most similar 
+                                                        sentences from our sentence corpus and obtained their cosine-similarity scores. We then took the median (due to the skewness of sentence scores) of the ten scores
+                                                        and obtained an embedding score for each repository, indicating how similar the repository is to the corresponding software type. We call this" , strong("repository similarity score."),
+                                                         "For each software type, we calculated the mean and standard deviation of", strong("similarity score"),	 "of all repositories. And we classify a
+                                                         repository with a", strong("repository similarity score"), "that is 2 standard deviation above the mean as the corresponding software type." ),
+                                                     h4(strong("IIII. Visualization")),
+                                                    p("To visualize embeddings, we used the embeddings of the repositories. Embeddings are in extremely high dimension (768-D). To make sense of the embeddings 
+                                                      in a lower dimension, we performed Principal Component Analysis. The interactive scatterplot shows the first two dimensions of the embeddings." ),
+                                                    h4(strong("IV. Take-away")),
+                                                    p("Clusters of software types is an indicator of the differences between them. However, some software types are more similar than some other software types.
+                                                      For example, artificial intelligence (AI) is more similar to data visualization than to blockchain since data visualization serves as a tool for showing
+                                                      AI results."),
+                                                    p("We proposed 2 standard deviation above the mean as a preliminary cutoff for the similarity score. Note that higher the cutoff, clearer the decision boundry 
+                                                      is between two clusters (software types).")
+                                                    
+                                                    
                                                      
                                                   ),
-                                       column(4, 
-                                              h4(strong("Results")),
-                                              tabsetPanel(
-                                                tabPanel("Embedding Visualization",
-                                                         checkboxGroupInput("software_type", "Software Type:",
-                                                                            c("App-Blockchain"= "app_blockchain",
-                                                                              "App-Database"="app_database",
-                                                                              "Programming Language-clang"="prog_clang",
-                                                                              "Programming Language-Java"="prog_java",
-                                                                              "Programming Language-Javascript"= "prog_javascript",
-                                                                              "Programming Language-php"= "prog_php",
-                                                                              "Programming Language-Python"= "prog_python",
-                                                                              "Topics-Artificial Intelligence"= "topics_ai",
-                                                                              "Topics-Data Visualization"= "topics_dataviz")),
-                                                         #TODO: Work on the slider bar, reverse the filled color
-                                                         #https://community.rstudio.com/t/shiny-slider-new-design/24765
-                                                         sliderInput("similarity_score", "Similarity Score:",
-                                                                     min = 0, max = 1, value = 100
-                                                         ),
-                                                         plotlyOutput("embedding_plot", width = "800px", height = "700px")
-                                                         ),
-                                                tabPanel("Classification Results"),
-                                                tabPanel("Classification Results",
-                                                  img(src = "bert_classification.png", style = "display: inline; margin-right: 5px; border: 1px solid #C0C0C0;", width = "800px")
-                                                  
-                                                )
-                                              )
+                                       column(8, 
+                                              h3(strong("Embedding Visualization")),
+                                              
+                                                        
+                                                         column(5, 
+                                                                
+                                                                checkboxGroupInput( "software_type", 
+                                                                                       "Software Type:",
+                                                                                       choices = c("App-Blockchain"= "app_blockchain",
+                                                                                                   "App-Database"="app_database",
+                                                                                                   "Programming Language-clang"="prog_clang",
+                                                                                                   "Programming Language-Java"="prog_java",
+                                                                                                   "Programming Language-Javascript"= "prog_javascript",
+                                                                                                   "Programming Language-php"= "prog_php",
+                                                                                                   "Programming Language-Python"= "prog_python",
+                                                                                                   "Topics-Artificial Intelligence"= "topics_ai",
+                                                                                                   "Topics-Data Visualization"= "topics_dataviz"),
+                                                                                       selected = c("topics_ai","app_blockchain"))
+                                                                ),
+                                                         column(4,
+                                                                sliderInput(inputId = "similarity_score", 
+                                                                             label = div(style = "width:300px",
+                                                                                          div(style = 'float:left;', 'lower similarity'),
+                                                                                          div(style = 'float:right;', 'higher similarity')),
+                                                                             min = 0, max = 1, value = 0.4, width = '300px'
+                                                                            )
+                                                                ),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         plotlyOutput("embedding_plot", width = "800px", height = "700px"),
+                                                         br(),
+                                                         p("Size of the circles indicate the number of stars. Larger the circle, more stars a repository has.")
+                                                         )
+                                                      )
 
-                                        )
-                                    )
-                                     
-                            ),
-                            tabPanel("Node2Vec Embeddings",  
-                                     h3(strong("Node2Vec Embeddings"), align = "center"), 
-                                     br(),
-                                     p("Based on a network of repositories (nodes) and collaberators (edges), the Node2Vec algorithm was used to generate embeddings.
-                                       As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on similarity in collaberators. To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions. As seen below
-                                       , repositories with the same language (indicated by color) are clustered together. The size of the node reflects degree centrality, which indicates how \"connected\" a node is."),
-                                     img(src='node2vec.png', align="center")
-                            )
-                          )
-                 ),
+                                                  ),
+                                          
+                          tabPanel("Node Embeddings",  
+                                   h3(strong(""), align = "center"), 
+                                   fluidRow(style = "margin: 6px;",
+                                            column(5, 
+                                                   h4(strong("Network Descriptives")),
+                                                   p(strong("Number of Nodes:"),"416",br(),
+                                                     strong("Number of Edges:"), "5237",br(),
+                                                     strong("Transitivity:"), ".602", br(),
+                                                     strong("Density:"), ".06", br(),
+                                                     strong("Average Cluster:"), ".439", br()),
+                                                   h4(strong("Node2Vec")),
+                                                   p("Based on a network of repositories (nodes) and collaberators (edges), the Node2Vec algorithm was used to generate embeddings. This is done through the generation
+                                                of biased random walks from each node (weighted by a parameter alpha), and then using Word2Vec to generate the embeddings.
+                                                To visualize the results, t-distributed stochastic neighbor embedding (tSNE) is used to reduce the dimensions, and the embeddings are plotted on a 2-D plane. 
+                                                As opposed to the sentence embedding approach based on the degree of similarity in content, node embedding focuses on common collaberators, which then leads to repositories with shared collaborators clustering closer together. 
+                                                As seen below, repositories with the same language (indicated by color) are clustered together. The size of the node reflects degree centrality, which indicates how \"connected\" a node is.")),
+                                            column(7,h4(strong("Results")),
+                                                   plotlyOutput("nodeEmbedding", width = "800px", height = "700px")
+                                            )
+                                          )
+                                )
+                    )
+                    )
+                    ),
+                 
+
                  # contact -----------------------------------------------------------
                  tabPanel("Contact", value = "contact",
                           fluidRow(style = "margin-left: 100px; margin-right: 100px;",
@@ -413,9 +529,10 @@ ui <- navbarPage(title = "OSS",
                                    h4(strong("Acknowledgments")),
                                    p(" In addition to our appreciation to Carol Robbins, Ledia Guci, and Bayoán Santiago Calderón for their continued support of work on OSS,
                                      we also want to thank Martin Fleming for joining us to talk about software classification.")
-                          )), 
-                 inverse = T)
-
+                                  )
+                          )
+                 
+)
 
 
 # server -----------------------------------------------------------
@@ -461,40 +578,58 @@ server <- function(input, output, session) {
      ) + 
        geom_point(aes(size = stars), alpha = 0.6) +
        scale_size_continuous(range = c(0.5, 10))+ 
-       xlim(-2, 2)+
-       ylim(-2,2)+
+       xlim(-1.5, 2)+
+       ylim(-1.5,2.2)+
        aes(colour = software_type)  + 
        labs(title = "Embeddings", 
-            subtitle = "1st + 2nd principal components")+
+            subtitle = "1st + 2nd principal components",
+            x = "First Principal Component",
+            y = "Second Principal Component")+
        theme_minimal()+
-       colScale
+       colScale +
+       theme(
+         #legend.key.size = unit(10, 'cm'), 
+         legend.text = element_text(size=10))
      
      ply1 <- ggplotly(p1, tooltip = c("slug", "software_type", "description", "stars"))%>%
        layout(legend = list(
-         orientation = "h"
+         orientation = "h",
+         y=0.99
        )
        )
-     
      ply1
-     # p2 <-ggplot(
-     #   filter(bert_embeddings_label, software_type %in% input$software_type), 
-     #   aes(x=y, 
-     #       y=z,
-     #       slug = slug,
-     #       description = description,
-     #       software_type = software_type,
-     #       stars= stars)
-     # ) +
-     #   geom_point()  + 
-     #   aes(colour = software_type) + 
-     #   theme(legend.position = "none") + 
-     #   labs( title = "Embeddings", subtitle = "2nd + 3rd principal components")+
-     #   theme_minimal()
-     # 
-     # ply2 <- ggplotly(p2, tooltip = c("slug", "software_type", "description", "stars"))
-     # plys = subplot(ply1, ply2, nrows=1)
-     #plys
    })
+  
+  
+  # Tab: Classification Method, Node Embedding------------------------------------------------
+  
+  output$nodeEmbedding <- renderPlotly({
+    colScale2 <- scale_colour_manual(name = "language", values = uva_col_distinct)
+    
+    dim1<-list(title="t-SNE Dimension 1", showgrid=FALSE)
+    
+    dim2<-list(title="t-SNE Dimension 2", showgrid=FALSE)
+    
+    p2 <- ggplot(
+      networks,
+      aes(x=x, 
+          y=y,
+          slug = slug,
+          description = description,
+          language = language)
+    ) + 
+      geom_point(aes(size = commits), alpha = 0.6) +
+      scale_size_continuous(range = c(0.5, 10))+ 
+      xlim(-30, 30)+
+      ylim(-30, 30)+
+      aes(colour = language)  + 
+      labs(title = "Node Embeddings")+
+      theme_minimal()+colScale2
+    ply2 <- ggplotly(p2, tooltip = c("slug", "language", "description", "page_rank"))%>%
+      layout(legend = list(orientation = "h")) %>% layout(xaxis=dim1, yaxis=dim2)
+    
+    ply2
+  })
   
   
 }
